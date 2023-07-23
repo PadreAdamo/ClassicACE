@@ -99,7 +99,7 @@ namespace ACE.Server.WorldObjects
             // TODO: ensure all monsters in the db have a targeting tactic
             var targetingTactic = TargetingTactic;
             if (targetingTactic == TargetingTactic.None)
-                targetingTactic = TargetingTactic.Random | TargetingTactic.TopDamager | TargetingTactic.Sneaking;
+                targetingTactic = TargetingTactic.Random | TargetingTactic.TopDamager;
 
             var possibleTactics = EnumHelper.GetFlags(targetingTactic);
             var rng = ThreadSafeRandom.Next(1, possibleTactics.Count - 1);
@@ -190,6 +190,11 @@ namespace ACE.Server.WorldObjects
             foreach (var targetDistance in targetDistances)
             {
                 target = targetDistance.Target as Player;
+                    //Sneak as a detaunt - Padre
+                    if (target.IsSneaking)
+                    FindNextTarget();
+                    continue;
+                
                 if (target == AttackTarget)
                     continue;
                 else if (target != null && target.IsAttemptingToTaunt)
@@ -313,14 +318,7 @@ namespace ACE.Server.WorldObjects
                             if (topDamager != null)
                                 AttackTarget = topDamager;
                             break;
-                        //Sneak as a detaunt - Padre
-                        case TargetingTactic.Sneaking:
-
-                            var sneaking = Player.IsSneaking?.TryGetAttacker () as Creature;
-                            if (sneaking != null)
-                                FindNextTarget();
-                            break;
-                  
+                           
                                 
 
                         // these below don't seem to be used in PY16 yet...
