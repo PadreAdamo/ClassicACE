@@ -401,14 +401,10 @@ namespace ACE.Server.WorldObjects
 
                 // can only target other monsters with Tolerance.Monster -- cannot target players or combat pets
                 if (Tolerance.HasFlag(Tolerance.Monster) && (creature is Player || creature is CombatPet))
-                    continue;
-        
-                //Sneak as a detaunt - Padre
-                if (creature is Play player && player.IsSneaking(this, distsq, $"{Name} is aware of you or you are sneaking test."))
-                    continue;
+                    continue;    
                 
-   //      if (creature is Player player && player.TestSneaking(this, distSq, $"{Name} sees you! You stop sneaking."))
-     //          continue;
+               if (creature is Player player && player.TestSneaking(this, distSq, $"{Name} sees you! You stop sneaking."))
+                    continue;
 
                 visibleTargets.Add(creature);
             }
