@@ -278,7 +278,7 @@ namespace ACE.Server.WorldObjects
 
                 var targetDistances = BuildTargetDistance(visibleTargets);
                 var tauntedBy = CheckForTauntingTargets(targetDistances); // We use the sorted by distance list here so closer targets roll first and thus have higher chance of taunting the monster.
-
+                                
                 if (tauntedBy != null)
                 {
                     // We've been taunted! Ignore our default tactic and attack this target!
@@ -402,9 +402,14 @@ namespace ACE.Server.WorldObjects
                 // can only target other monsters with Tolerance.Monster -- cannot target players or combat pets
                 if (Tolerance.HasFlag(Tolerance.Monster) && (creature is Player || creature is CombatPet))
                     continue;
-            // Commented out for detaunt
-           //   if (creature is Player player && player.TestSneaking(this, distSq, $"{Name} sees you! You stop sneaking."))
-             //     continue;
+        
+                //Sneak as a detaunt - Padre
+                if (target.IsSneaking)
+                   FindNextTarget();
+                   continue;
+                
+     //         if (creature is Player player && player.TestSneaking(this, distSq, $"{Name} sees you! You stop sneaking."))
+      //          continue;
 
                 visibleTargets.Add(creature);
             }
