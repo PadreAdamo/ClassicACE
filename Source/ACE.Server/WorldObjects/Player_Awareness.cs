@@ -114,7 +114,9 @@ namespace ACE.Server.WorldObjects
                 else if (distanceSquared < creature.VisualAwarenessRangeSq / 10)
                     difficulty = (uint)((creature.Level ?? 1) * 1.0f);
                 else if (distanceSquared < creature.VisualAwarenessRangeSq / 5)
+
                     difficulty = (uint)((creature.Level ?? 1) * 0.6f);
+
                 else
                     difficulty = (uint)((creature.Level ?? 1) * 0.3f);
             }
