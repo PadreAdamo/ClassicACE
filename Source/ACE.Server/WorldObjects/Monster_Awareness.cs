@@ -312,6 +312,14 @@ namespace ACE.Server.WorldObjects
                                 AttackTarget = topDamager;
                             break;
 
+                        //Testing to turn Sneak into a detaunt - Padre
+                        case TargetingTactic.Sneaking:
+
+                            var sneaking = Player.IsSneaking;
+                            if (sneaking != null)
+                                FindNextTarget();
+                            break;
+
                         // these below don't seem to be used in PY16 yet...
 
                         case TargetingTactic.Weakest:

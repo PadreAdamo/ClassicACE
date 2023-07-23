@@ -112,14 +112,14 @@ namespace ACE.Server.WorldObjects
                     return false;
                 }
                 else if (distanceSquared < creature.VisualAwarenessRangeSq / 10)
-                    difficulty = (uint)((creature.Level ?? 1) * 1.5f);
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 5)
                     difficulty = (uint)((creature.Level ?? 1) * 1.0f);
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 5)
+                    difficulty = (uint)((creature.Level ?? 1) * 0.6f);
                 else
-                    difficulty = (uint)((creature.Level ?? 1) * 0.5f);
+                    difficulty = (uint)((creature.Level ?? 1) * 0.3f);
             }
             else
-                difficulty = (uint)((creature.Level ?? 1) * 0.2f);
+                difficulty = (uint)((creature.Level ?? 1) * 0.1f);
 
             return TestSneaking(difficulty, failureMessage);
         }
