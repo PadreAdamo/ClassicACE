@@ -102,21 +102,23 @@ namespace ACE.Server.WorldObjects
                 return true;
 
             uint difficulty;
-
-            var angle = Math.Abs(creature.GetAngle(this));
-            if (angle < 1)
-            {
-                if (distanceSquared < 0)
-                {
-                    EndSneaking(failureMessage);
-                    return false;
-                }
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 10)
-                    difficulty = (uint)((creature.Level ?? 1) * 1.5f);
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 5)
+/// Removing immediate failure from sneak from equation for more reliable detaunt effect
+        var angle = Math.Abs(creature.GetAngle(this));
+          if (angle < 45)
+          {
+            ///    if (distanceSquared < 2)
+               // {
+                 ///   EndSneaking(failureMessage);
+                   /// return false;
+               /// }
+              if (distanceSquared < creature.VisualAwarenessRangeSq / 4)
                     difficulty = (uint)((creature.Level ?? 1) * 1.0f);
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 3)
+                    difficulty = (uint)((creature.Level ?? 1) * 0.8f);
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 2)
+                    difficulty = (uint)((creature.Level ?? 1) * 0.7f);
                 else
-                    difficulty = (uint)((creature.Level ?? 1) * 0.5f);
+                    difficulty = (uint)((creature.Level ?? 1) * 0.8f);
             }
             else
                 difficulty = (uint)((creature.Level ?? 1) * 0.2f);
