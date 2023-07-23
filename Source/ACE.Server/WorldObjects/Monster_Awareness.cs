@@ -204,7 +204,9 @@ namespace ACE.Server.WorldObjects
                     var activationChance = ThreadSafeRandom.Next(0.0f, 1.0f);
                     if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 3.0)
                         continue;
-                    else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 1.0)
+
+                    else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 1.5)
+
                         continue;
                     else if (activationChance > 0.10)
                         continue;
@@ -310,6 +312,14 @@ namespace ACE.Server.WorldObjects
                             var topDamager = DamageHistory.TopDamager?.TryGetAttacker() as Creature;
                             if (topDamager != null)
                                 AttackTarget = topDamager;
+                            break;
+
+                        //Testing to turn Sneak into a detaunt - Padre
+                        case TargetingTactic.Sneaking:
+
+                            var sneaking = Player.IsSneaking;
+                            if (sneaking != null)
+                                FindNextTarget();
                             break;
 
                         // these below don't seem to be used in PY16 yet...
