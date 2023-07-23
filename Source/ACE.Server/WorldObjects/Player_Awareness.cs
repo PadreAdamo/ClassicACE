@@ -120,8 +120,8 @@ namespace ACE.Server.WorldObjects
                 else
                     difficulty = (uint)((creature.Level ?? 1) * 0.8f);
             }
-            else
-                difficulty = (uint)((creature.Level ?? 1) * 0.1f);
+        ///    else
+           ///     difficulty = (uint)((creature.Level ?? 1) * 0.1f);
 
             return TestSneaking(difficulty, failureMessage);
         }
