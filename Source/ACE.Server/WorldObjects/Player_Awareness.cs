@@ -103,8 +103,8 @@ namespace ACE.Server.WorldObjects
 
             uint difficulty;
 /// Removing immediate failure from sneak from equation for more reliable detaunt effect
-        var angle = Math.Abs(creature.GetAngle(this));
-          if (angle < 45)
+     ///   var angle = Math.Abs(creature.GetAngle(this));
+        ///  if (angle < 45)
           {
             ///    if (distanceSquared < 2)
                // {
