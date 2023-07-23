@@ -99,7 +99,7 @@ namespace ACE.Server.WorldObjects
             // TODO: ensure all monsters in the db have a targeting tactic
             var targetingTactic = TargetingTactic;
             if (targetingTactic == TargetingTactic.None)
-                targetingTactic = TargetingTactic.Random | TargetingTactic.TopDamager;
+                targetingTactic = TargetingTactic.Random | TargetingTactic.TopDamager | TargetingTactic.Sneaking;
 
             var possibleTactics = EnumHelper.GetFlags(targetingTactic);
             var rng = ThreadSafeRandom.Next(1, possibleTactics.Count - 1);
@@ -313,6 +313,15 @@ namespace ACE.Server.WorldObjects
                             if (topDamager != null)
                                 AttackTarget = topDamager;
                             break;
+                        //Sneak as a detaunt - Padre
+                        case TargetingTactic.Sneaking:
+
+                            var sneaking = Player.IsSneaking?.TryGetAttacker () as Creature;
+                            if (sneaking != null)
+                                FindNextTarget();
+                            break;
+                  
+                                
 
                         // these below don't seem to be used in PY16 yet...
 
@@ -396,11 +405,6 @@ namespace ACE.Server.WorldObjects
                 if (Tolerance.HasFlag(Tolerance.Monster) && (creature is Player || creature is CombatPet))
                     continue;
 
-                //Testing to turn Sneak into a detaunt - Padre
-                if Player.IsSneaking;
-                    FindNextTarget();
-                    continue;
-                
                 if (creature is Player player && player.TestSneaking(this, distSq, $"{Name} sees you! You stop sneaking."))
                     continue;
 
