@@ -145,7 +145,6 @@ namespace ACE.Server.WorldObjects
                 return false;
             }
             else
-                visibleTargets.remove(creature);
                 return true;
         }
 
