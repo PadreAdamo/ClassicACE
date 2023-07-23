@@ -111,11 +111,11 @@ namespace ACE.Server.WorldObjects
                  ///   EndSneaking(failureMessage);
                    /// return false;
                /// }
-              if (distanceSquared < creature.VisualAwarenessRangeSq / 200)
+              if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
                     difficulty = (uint)((creature.Level ?? 1) * 0.2f);
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 200)
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
                     difficulty = (uint)((creature.Level ?? 1) * 0.15f);
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 200)
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
                     difficulty = (uint)((creature.Level ?? 1) * 0.13f);
                 else
                     difficulty = (uint)((creature.Level ?? 1) * 0.0f);
@@ -145,6 +145,7 @@ namespace ACE.Server.WorldObjects
                 return false;
             }
             else
+                visibleTargets.remove(creature);
                 return true;
         }
 
