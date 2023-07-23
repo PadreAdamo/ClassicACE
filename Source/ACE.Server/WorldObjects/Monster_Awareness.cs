@@ -314,14 +314,6 @@ namespace ACE.Server.WorldObjects
                                 AttackTarget = topDamager;
                             break;
 
-                        //Testing to turn Sneak into a detaunt - Padre
-                        case TargetingTactic.Sneaking:
-
-                            var sneaking = Player.IsSneaking;
-                            if (sneaking != null)
-                                FindNextTarget();
-                            break;
-
                         // these below don't seem to be used in PY16 yet...
 
                         case TargetingTactic.Weakest:
@@ -404,6 +396,11 @@ namespace ACE.Server.WorldObjects
                 if (Tolerance.HasFlag(Tolerance.Monster) && (creature is Player || creature is CombatPet))
                     continue;
 
+                //Testing to turn Sneak into a detaunt - Padre
+                if Player.IsSneaking;
+                    FindNextTarget();
+                    continue;
+                
                 if (creature is Player player && player.TestSneaking(this, distSq, $"{Name} sees you! You stop sneaking."))
                     continue;
 
