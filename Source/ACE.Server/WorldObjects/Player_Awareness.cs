@@ -104,16 +104,16 @@ namespace ACE.Server.WorldObjects
             uint difficulty;
 
             var angle = Math.Abs(creature.GetAngle(this));
-            if (angle < 1)
+            if (angle < 10)
             {
-                if (distanceSquared < 0)
+                if (distanceSquared < 1)
                 {
                     EndSneaking(failureMessage);
                     return false;
                 }
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 10)
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 4)
                     difficulty = (uint)((creature.Level ?? 1) * 1.5f);
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 5)
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 2)
                     difficulty = (uint)((creature.Level ?? 1) * 1.0f);
                 else
                     difficulty = (uint)((creature.Level ?? 1) * 0.5f);
