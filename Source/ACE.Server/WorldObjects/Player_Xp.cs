@@ -107,22 +107,6 @@ namespace ACE.Server.WorldObjects
                     totalXP = (thirdXP * typeCampBonus) + (thirdXP * areaCampBonus) + (thirdXP * restCampBonus);
 
                     xpMessage = $"{xpMessage}{(xpMessage.Length > 0 ? " " : "")}T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%";
-
-                    if (CurrentLandblock != null && EventManager.HotDungeonLandblock == CurrentLandblock.Id.Raw >> 16)
-                    {
-                        var extraXP = totalXP * (float)PropertyManager.GetDouble("hot_dungeon_bonus_xp").Item;
-                        totalXP += extraXP;
-
-                        xpMessage = $"Hot Dungeon Bonus: +{extraXP:N0}xp {xpMessage}";
-                    }
-                }
-
-                if (CurrentLandblock != null && !(CurrentLandblock.IsDungeon || (CurrentLandblock.HasDungeon && Location.Indoors)))
-                {
-                    var extraXP = totalXP * (float)PropertyManager.GetDouble("surface_bonus_xp").Item; // Surface provides extra xp to account for lower creature density.
-                    totalXP += extraXP;
-
-                    xpMessage = $"Surface Bonus: +{extraXP:N0}xp {xpMessage}";
                 }
 
                 amount = (long)Math.Round(totalXP);
@@ -262,11 +246,58 @@ namespace ACE.Server.WorldObjects
 
             var m_amount = (long)Math.Round(amount * enchantment * modifier);
 
+            var m_amount_before_extra = m_amount;
+
             if (m_amount < 0)
             {
                 log.Warn($"{Name}.EarnXP({amount}, {shareType})");
                 log.Warn($"modifier: {modifier}, enchantment: {enchantment}, m_amount: {m_amount}");
                 return;
+            }
+            else
+            {
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    float totalExtraXP = 0;
+                    if (xpType == XpType.Quest || xpType == XpType.Exploration)
+                    {
+                        if (Level < (MaxReachedLevel ?? 1))
+                        {
+                            var extraXP = m_amount * (float)PropertyManager.GetDouble("relive_bonus_xp").Item;
+                            totalExtraXP += extraXP;
+
+                            xpMessage = $"Relive Bonus: +{extraXP:N0}xp {xpMessage}";
+                        }
+                    }
+                    else if (xpType == XpType.Kill)
+                    {
+                        if (CurrentLandblock != null && EventManager.HotDungeonLandblock == CurrentLandblock.Id.Raw >> 16)
+                        {
+                            var extraXP = m_amount * (float)PropertyManager.GetDouble("hot_dungeon_bonus_xp").Item;
+                            totalExtraXP += extraXP;
+
+                            xpMessage = $"Hot Dungeon Bonus: +{extraXP:N0}xp {xpMessage}";
+                        }
+
+                        if (CurrentLandblock != null && !(CurrentLandblock.IsDungeon || (CurrentLandblock.HasDungeon && Location.Indoors)))
+                        {
+                            var extraXP = m_amount * (float)PropertyManager.GetDouble("surface_bonus_xp").Item; // Surface provides extra xp to account for lower creature density.
+                            totalExtraXP += extraXP;
+
+                            xpMessage = $"Surface Bonus: +{extraXP:N0}xp {xpMessage}";
+                        }
+
+                        if (Level < (MaxReachedLevel ?? 1))
+                        {
+                            var extraXP = m_amount * (float)PropertyManager.GetDouble("relive_bonus_xp").Item;
+                            totalExtraXP += extraXP;
+
+                            xpMessage = $"Relive Bonus: +{extraXP:N0}xp {xpMessage}";
+                        }
+                    }
+
+                    m_amount += (long)Math.Round(totalExtraXP);
+                }
             }
 
             GrantXP(m_amount, xpType, shareType, xpMessage);
@@ -276,21 +307,21 @@ namespace ACE.Server.WorldObjects
                 if (Exploration1LandblockId == CurrentLandblock.Id.Raw >> 16 && Exploration1KillProgressTracker > 0)
                 {
                     Exploration1KillProgressTracker--;
-                    long explorationXP = (long)(m_amount * (float)PropertyManager.GetDouble("exploration_bonus_xp").Item);
+                    long explorationXP = (long)(m_amount_before_extra * (float)PropertyManager.GetDouble("exploration_bonus_xp").Item);
                     xpMessage = $"{Exploration1KillProgressTracker:N0} kill{(Exploration1KillProgressTracker != 1 ? "s" : "")} remaining.";
                     GrantXP(explorationXP, XpType.Exploration, ShareType.None, xpMessage);
                 }
                 else if (Exploration2LandblockId == CurrentLandblock.Id.Raw >> 16 && Exploration2KillProgressTracker > 0)
                 {
                     Exploration2KillProgressTracker--;
-                    long explorationXP = (long)(m_amount * (float)PropertyManager.GetDouble("exploration_bonus_xp").Item);
+                    long explorationXP = (long)(m_amount_before_extra * (float)PropertyManager.GetDouble("exploration_bonus_xp").Item);
                     xpMessage = $"{Exploration2KillProgressTracker:N0} kill{(Exploration2KillProgressTracker != 1 ? "s" : "")} remaining.";
                     GrantXP(explorationXP, XpType.Exploration, ShareType.None, xpMessage);
                 }
                 else if (Exploration3LandblockId == CurrentLandblock.Id.Raw >> 16 && Exploration3KillProgressTracker > 0)
                 {
                     Exploration3KillProgressTracker--;
-                    long explorationXP = (long)(m_amount * (float)PropertyManager.GetDouble("exploration_bonus_xp").Item);
+                    long explorationXP = (long)(m_amount_before_extra * (float)PropertyManager.GetDouble("exploration_bonus_xp").Item);
                     xpMessage = $"{Exploration3KillProgressTracker:N0} kill{(Exploration3KillProgressTracker != 1 ? "s" : "")} remaining.";
                     GrantXP(explorationXP, XpType.Exploration, ShareType.None, xpMessage);
                 }
@@ -412,6 +443,9 @@ namespace ACE.Server.WorldObjects
                         Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} exploration experience!", ChatMessageType.Broadcast));
                 }
             }
+
+            if (HasVitae && IsHardcore && xpType != XpType.Kill)
+                return; // Only kill xp reduces hardcore vitae penalty.
 
             if (HasVitae && xpType != XpType.Allegiance)
                 UpdateXpVitae(amount);
@@ -598,6 +632,9 @@ namespace ACE.Server.WorldObjects
                     TotalSkillCredits += (int)xpTable.CharacterLevelSkillCreditList[Level ?? 0];
                     creditEarned = true;
                 }
+
+                if (Level <= maxLevel && Level > (MaxReachedLevel ?? 1))
+                    MaxReachedLevel = Level;
 
                 // break if we reach max
                 if (Level == maxLevel)
@@ -1082,18 +1119,32 @@ namespace ACE.Server.WorldObjects
         {
             // Destroy all items
             var inventory = GetAllPossessions();
+            var inventoryToDelete = new List<WorldObject>();
 
             foreach (var item in inventory)
             {
                 if (keepHousing && item.WeenieType == WeenieType.Deed) // Keep houses
-                    continue;
-                if (keepBondedEquipment && (item.ValidLocations ?? EquipMask.None) != EquipMask.None && item.Bonded == BondedStatus.Bonded && item.WeenieClassId != (int)Factories.Enum.WeenieClassName.ringHardcore && item.WeenieClassId != (uint)Factories.Enum.WeenieClassName.explorationContract)
                 {
-                    if(item.CurrentWieldedLocation != null)
+                    if (item.CurrentWieldedLocation != null || item.Container != this)
                         HandleActionPutItemInContainer(item.Guid.Full, Guid.Full);
                     continue;
                 }
 
+                if (keepBondedEquipment
+                    && (item.ValidLocations ?? EquipMask.None) != EquipMask.None && item.Bonded == BondedStatus.Bonded
+                    && item.WeenieClassId != (int)Factories.Enum.WeenieClassName.ringHardcore
+                    && item.WeenieClassId != (uint)Factories.Enum.WeenieClassName.explorationContract)
+                {
+                    if(item.CurrentWieldedLocation != null || item.Container != this)
+                        HandleActionPutItemInContainer(item.Guid.Full, Guid.Full);
+                    continue;
+                }
+
+                inventoryToDelete.Add(item);
+            }
+
+            foreach (var item in inventoryToDelete)
+            {
                 item.DeleteObject(this);
             }
 
