@@ -168,7 +168,7 @@ namespace ACE.Server.WorldObjects
                 else
                 {
                     var defenseSkill = GetCreatureSkill(Skill.AssessCreature);
-                    var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
+                    var avoidChance = 0.5f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
 
                     if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
                     {
