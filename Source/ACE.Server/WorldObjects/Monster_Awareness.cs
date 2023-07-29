@@ -207,13 +207,13 @@ namespace ACE.Server.WorldObjects
                     Entity.CreatureSkill skill = target.GetCreatureSkill(Skill.Deception);
 
                     var activationChance = ThreadSafeRandom.Next(0.0f, 1.0f);
-                    if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 3.0)
+                    if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 5.0)
                         continue;
 
-                    else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 1.5)
+                    else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 3.0)
 
                         continue;
-                    else if (activationChance > 0.10)
+                    else if (activationChance > 1.5)
                         continue;
 
                     if (target.attacksReceivedPerSecond >= skill.Current / 60.0f)
@@ -225,7 +225,7 @@ namespace ACE.Server.WorldObjects
                     target.UpdateVitalDelta(target.Mana, -manaCost); // We're past the activation stage so no matter if we succeed or not we consume the mana.
 
                     Entity.CreatureSkill defenseSkill = GetCreatureSkill(Skill.AssessCreature);
-                    var avoidChance = 0.5f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
+                    var avoidChance = 0.3f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
 
                     if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
                     {
