@@ -121,7 +121,9 @@ namespace ACE.Server.WorldObjects
                             Creature creatureAttacker = attacker as Creature;
                             if (creatureAttacker != null)
                             {
-                                var chance = 0.4f;
+                              // Base chance is below for Riposte
+                                //  var chance = 0.4f;
+                                var chance = 1.0F;
                                 if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
                                 {
                                     // Chance of striking back at the target when successfully evading an attack while using the Riposte technique.
@@ -138,7 +140,9 @@ namespace ACE.Server.WorldObjects
                         Creature creatureAttacker = attacker as Creature;
                         if (creatureAttacker != null)
                         {
-                            var chance = 0.4f;
+                         //base Riposte chance is below
+                            //   var chance = 0.4f;
+                            var chance = 1.0F;
                             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
                             {
                                 // Chance of striking back at the target while dual wielding when receiving an attack.
@@ -1036,10 +1040,10 @@ namespace ACE.Server.WorldObjects
         {
             var strAndEnd = Strength.Base + Endurance.Base;
 
-            if (strAndEnd > 400)        return "Indomitable";
-            else if (strAndEnd > 360)   return "Resilient";
-            else if (strAndEnd > 300)   return "Hardy";
-            else if (strAndEnd > 200)   return "Mediocre";
+            if (strAndEnd > 380)        return "Indomitable";
+            else if (strAndEnd > 340)   return "Resilient";
+            else if (strAndEnd > 260)   return "Hardy";
+            else if (strAndEnd > 180)   return "Mediocre";
             else if (strAndEnd > 100)   return "Poor";
             else
                 return "None";
@@ -1049,10 +1053,10 @@ namespace ACE.Server.WorldObjects
         {
             var strAndEnd = Strength.Base + 2 * Endurance.Base;
 
-            if (strAndEnd > 400)        return "Indomitable";
-            else if (strAndEnd > 360)   return "Resilient";
-            else if (strAndEnd > 300)   return "Hardy";
-            else if (strAndEnd > 200)   return "Mediocre";
+            if (strAndEnd > 380)        return "Indomitable";
+            else if (strAndEnd > 340)   return "Resilient";
+            else if (strAndEnd > 260)   return "Hardy";
+            else if (strAndEnd > 180)   return "Mediocre";
             else if (strAndEnd > 100)   return "Poor";
             else
                 return "None";
