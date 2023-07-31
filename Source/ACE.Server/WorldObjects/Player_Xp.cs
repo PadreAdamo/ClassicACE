@@ -248,6 +248,8 @@ namespace ACE.Server.WorldObjects
 
             var m_amount_before_extra = m_amount;
 
+            long extraNotSharedAmount = 0;
+
             if (m_amount < 0)
             {
                 log.Warn($"{Name}.EarnXP({amount}, {shareType})");
@@ -259,12 +261,13 @@ namespace ACE.Server.WorldObjects
                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                 {
                     float totalExtraXP = 0;
+                    float totalNotSharedExtraXP = 0;
                     if (xpType == XpType.Quest || xpType == XpType.Exploration)
                     {
                         if (Level < (MaxReachedLevel ?? 1))
                         {
                             var extraXP = m_amount * (float)PropertyManager.GetDouble("relive_bonus_xp").Item;
-                            totalExtraXP += extraXP;
+                            totalNotSharedExtraXP += extraXP;
 
                             xpMessage = $"Relive Bonus: +{extraXP:N0}xp {xpMessage}";
                         }
@@ -290,17 +293,18 @@ namespace ACE.Server.WorldObjects
                         if (Level < (MaxReachedLevel ?? 1))
                         {
                             var extraXP = m_amount * (float)PropertyManager.GetDouble("relive_bonus_xp").Item;
-                            totalExtraXP += extraXP;
+                            totalNotSharedExtraXP += extraXP;
 
                             xpMessage = $"Relive Bonus: +{extraXP:N0}xp {xpMessage}";
                         }
                     }
 
                     m_amount += (long)Math.Round(totalExtraXP);
+                    extraNotSharedAmount += (long)Math.Round(totalNotSharedExtraXP);
                 }
             }
 
-            GrantXP(m_amount, xpType, shareType, xpMessage);
+            GrantXP(m_amount, xpType, shareType, xpMessage, extraNotSharedAmount);
 
             if (xpType == XpType.Kill && CurrentLandblock != null)
             {
@@ -334,7 +338,7 @@ namespace ACE.Server.WorldObjects
         /// <param name="amount">The amount of XP to grant to the player</param>
         /// <param name="xpType">The source of the XP being granted</param>
         /// <param name="shareable">If TRUE, this XP can be shared with fellowship members</param>
-        public void GrantXP(long amount, XpType xpType, ShareType shareType = ShareType.All, string xpMessage = "")
+        public void GrantXP(long amount, XpType xpType, ShareType shareType = ShareType.All, string xpMessage = "", long extraNotSharedAmount = 0, string sourceString = "")
         {
             if (GameplayMode == GameplayModes.Limbo)
             {
@@ -354,12 +358,12 @@ namespace ACE.Server.WorldObjects
             {
                 // this will divy up the XP, and re-call this function
                 // with ShareType.Fellowship removed
-                Fellowship.SplitXp((ulong)amount, xpType, shareType, this, xpMessage);
+                Fellowship.SplitXp((ulong)amount, xpType, shareType, this, xpMessage, extraNotSharedAmount);
                 return;
             }
 
             // Make sure UpdateXpAndLevel is done on this players thread
-            EnqueueAction(new ActionEventDelegate(() => UpdateXpAndLevel(amount, xpType, xpMessage)));
+            EnqueueAction(new ActionEventDelegate(() => UpdateXpAndLevel(amount + extraNotSharedAmount, xpType, xpMessage, sourceString)));
 
             //Update XP tracking info
             try
@@ -370,7 +374,7 @@ namespace ACE.Server.WorldObjects
                     XpTrackerTotalXp = 0;
                 }
 
-                XpTrackerTotalXp += amount;
+                XpTrackerTotalXp += amount + extraNotSharedAmount;
             }
             catch (Exception ex)
             {
@@ -390,7 +394,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Adds XP to a player's total XP, handles triggers (vitae, level up)
         /// </summary>
-        private void UpdateXpAndLevel(long amount, XpType xpType, string xpMessage = "")
+        private void UpdateXpAndLevel(long amount, XpType xpType, string xpMessage = "", string sourceString = "")
         {
             // until we are max level we must make sure that we send
             var xpTable = DatManager.PortalDat.XpTable;
@@ -425,20 +429,25 @@ namespace ACE.Server.WorldObjects
                 CheckForLevelup();
             }
 
+            if(xpMessage != "")
+                xpMessage = $" {xpMessage.Trim()}";
+
             if (xpType == XpType.Quest)
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} experience. {xpMessage}", ChatMessageType.Broadcast));
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} experience.{xpMessage}", ChatMessageType.Broadcast));
             else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
+                if (xpType == XpType.Fellowship && sourceString == "")
+                    Session.Network.EnqueueSend(new GameMessageSystemChat($"Your fellowship shared {amount:N0} experience with you!{xpMessage}", ChatMessageType.Broadcast));
                 if (xpType == XpType.Fellowship)
-                    Session.Network.EnqueueSend(new GameMessageSystemChat($"Your fellowship shared {amount:N0} experience with you!", ChatMessageType.Broadcast));
+                    Session.Network.EnqueueSend(new GameMessageSystemChat($"Your fellow {sourceString} shared {amount:N0} experience with you!{xpMessage}", ChatMessageType.Broadcast));
                 else if (xpType == XpType.Kill && xpMessage != "")
-                    Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} experience! {xpMessage}", ChatMessageType.Broadcast));
+                    Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} experience!{xpMessage}", ChatMessageType.Broadcast));
                 else if (amount > 0 && xpType == XpType.Proficiency && xpMessage != "")
-                    Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} {xpMessage} experience!", ChatMessageType.Broadcast));
+                    Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0}{xpMessage} experience!", ChatMessageType.Broadcast));
                 else if (amount > 0 && xpType == XpType.Exploration)
                 {
                     if (xpMessage != "")
-                        Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} exploration experience! {xpMessage}", ChatMessageType.Broadcast));
+                        Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} exploration experience!{xpMessage}", ChatMessageType.Broadcast));
                     else
                         Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} exploration experience!", ChatMessageType.Broadcast));
                 }

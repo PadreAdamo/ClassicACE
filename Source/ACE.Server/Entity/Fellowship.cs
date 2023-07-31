@@ -518,19 +518,43 @@ namespace ACE.Server.Entity
             }
         }
 
+        public void CalculateLeadershipLoyaltyFellowshipExtraXP(ulong baseAmount, float leadershipXpMod, Player member, out string xpMessage, out ulong moddedAmount)
+        {
+            xpMessage = "";
+            moddedAmount = baseAmount;
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return;
+
+            var loyaltyXpMod = Math.Min(member.GetCurrentLoyalty(), AllegianceManager.SkillCap) / AllegianceManager.SkillCap * 0.25f;
+            var leadershipExtraXp = (ulong)Math.Round(baseAmount * leadershipXpMod);
+            moddedAmount += leadershipExtraXp;
+
+            var loyaltyExtraXp = (ulong)Math.Round(baseAmount * loyaltyXpMod);
+            moddedAmount += loyaltyExtraXp;
+
+            if (loyaltyExtraXp > 0)
+                xpMessage = $"Loyalty Bonus: +{loyaltyExtraXp:N0}xp {xpMessage}";
+
+            if (leadershipExtraXp > 0)
+                xpMessage = $"Leadership Bonus: +{leadershipExtraXp:N0}xp {xpMessage}";
+        }
+
         /// <summary>
         /// Splits XP amongst fellowship members, depending on XP type and fellow settings
         /// </summary>
         /// <param name="amount">The input amount of XP</param>
         /// <param name="xpType">The type of XP (quest XP is handled differently)</param>
         /// <param name="player">The fellowship member who originated the XP</param>
-        public void SplitXp(ulong amount, XpType xpType, ShareType shareType, Player player, string xpMessage = "")
+        public void SplitXp(ulong amount, XpType xpType, ShareType shareType, Player player, string xpMessage = "", long extraNotSharedAmount = 0)
         {
             // https://asheron.fandom.com/wiki/Announcements_-_2002/02_-_Fever_Dreams#Letter_to_the_Players_1
 
             var fellowshipMembers = GetLikeFellowshipMembers(player); // Split fellowship xp sharing between hardcore and non-hardcore members.
 
             shareType &= ~ShareType.Fellowship;
+
+            var leadershipXpMod = Math.Min(player.GetCurrentLeadership(), AllegianceManager.SkillCap) / AllegianceManager.SkillCap * 0.25f;
 
             // quest turn-ins: flat share (retail default)
             if (xpType == XpType.Quest && !PropertyManager.GetBool("fellow_quest_bonus").Item)
@@ -541,7 +565,12 @@ namespace ACE.Server.Entity
                 {
                     var fellowXpType = player == member ? XpType.Quest : XpType.Fellowship;
 
-                    member.GrantXP(perAmount, fellowXpType, shareType, player == member ? xpMessage : "");
+                    var moddedAmount = (ulong)perAmount;
+                    var fellowXpMessage = "";
+                    if (player != member)
+                        CalculateLeadershipLoyaltyFellowshipExtraXP((ulong)perAmount, leadershipXpMod, member, out fellowXpMessage, out moddedAmount);
+
+                    member.GrantXP((long)moddedAmount, fellowXpType, shareType, player == member ? xpMessage : fellowXpMessage, player == member ? extraNotSharedAmount : 0, player == member ? "" : player.Name);
                 }
             }
 
@@ -557,7 +586,12 @@ namespace ACE.Server.Entity
 
                     var fellowXpType = player == member ? xpType : XpType.Fellowship;
 
-                    member.GrantXP((long)shareAmount, fellowXpType, shareType, player == member ? xpMessage : "");
+                    var moddedAmount = shareAmount;
+                    var fellowXpMessage = "";
+                    if (player != member)
+                        CalculateLeadershipLoyaltyFellowshipExtraXP(shareAmount, leadershipXpMod, member, out fellowXpMessage, out moddedAmount);
+
+                    member.GrantXP((long)moddedAmount, fellowXpType, shareType, player == member ? xpMessage : fellowXpMessage, player == member ? extraNotSharedAmount : 0, player == member ? "" : player.Name);
                 }
 
                 return;
@@ -577,7 +611,12 @@ namespace ACE.Server.Entity
 
                     var fellowXpType = player == member ? xpType : XpType.Fellowship;
 
-                    member.GrantXP((long)playerTotal, fellowXpType, shareType, player == member ? xpMessage : "");
+                    var moddedAmount = playerTotal;
+                    var fellowXpMessage = "";
+                    if (player != member)
+                        CalculateLeadershipLoyaltyFellowshipExtraXP(playerTotal, leadershipXpMod, member, out fellowXpMessage, out moddedAmount);
+
+                    member.GrantXP((long)moddedAmount, fellowXpType, shareType, player == member ? xpMessage : fellowXpMessage, player == member ? extraNotSharedAmount : 0, player == member ? "" : player.Name);
                 }
             }
         }
