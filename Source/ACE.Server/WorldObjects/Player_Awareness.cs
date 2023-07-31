@@ -44,7 +44,7 @@ namespace ACE.Server.WorldObjects
                 //actionChain.AddAction(this, () => EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingBegin)));
                 //actionChain.EnqueueChain();
             }
-            else if(result == SneakingTestResult.Failure)
+            else if (result == SneakingTestResult.Failure)
                 Session.Network.EnqueueSend(new GameMessageSystemChat("You fail on your attempt to start sneaking.", ChatMessageType.Broadcast));
             else
                 Session.Network.EnqueueSend(new GameMessageSystemChat("You are not trained in sneaking!", ChatMessageType.Broadcast));
