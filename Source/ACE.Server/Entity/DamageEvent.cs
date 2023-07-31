@@ -108,6 +108,9 @@ namespace ACE.Server.Entity
         public float DamageMitigated;
         public float DamageBlocked;
 
+        //Damage reduction for the extra pierced target from Spear
+        public float PierceTargets;
+
         // creature attacker
         public MotionCommand? AttackMotion;
         public AttackHook AttackHook;
@@ -984,6 +987,7 @@ namespace ACE.Server.Entity
 
             if (IgnoreMagicArmor)
                 info += $"IgnoreMagicArmor: {IgnoreMagicArmor}\n";
+      
             if (IgnoreMagicResist)
                 info += $"IgnoreMagicResist: {IgnoreMagicResist}\n";
 
