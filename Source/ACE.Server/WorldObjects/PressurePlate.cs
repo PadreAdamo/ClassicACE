@@ -79,10 +79,10 @@ namespace ACE.Server.WorldObjects
             if (!(activator is Player player))
                 return;
 
-                        var currentTime = DateTime.UtcNow;
+            var currentTime = DateTime.UtcNow;
             if (currentTime < LastUseTime + TimeSpan.FromSeconds(2))
                 return;
-                        LastUseTime = currentTime;
+            LastUseTime = currentTime;
 
             if (!NextActivationIsFromUse && ResistAwareness.HasValue)
             {
@@ -92,6 +92,12 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
             }
+
+            NextActivationIsFromUse = false;
+
+            // prevent continuous event stream
+            // TODO: should this go in base.OnActivate()?
+
 
             player.EnqueueBroadcast(new GameMessageSound(player.Guid, UseSound));
 

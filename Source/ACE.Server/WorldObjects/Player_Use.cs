@@ -45,7 +45,7 @@ namespace ACE.Server.WorldObjects
                 SendUseDoneEvent();
                 return;
             }
-            
+
             // Resolve the guid to an object that is either in our possession or on the Landblock
             var target = FindObject(targetObjectGuid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
 
@@ -58,7 +58,7 @@ namespace ACE.Server.WorldObjects
 
             if ((sourceItem.TacticAndTechniqueId ?? 0) != (int)TacticAndTechniqueType.Sneak && (sourceItem.TacticAndTechniqueId ?? 0) != (int)TacticAndTechniqueType.Misdirect && target.WeenieType != WeenieType.Door)
                 EndSneaking();
-            
+
             // handle objects with built-in spells
             if (sourceItem.SpellDID != null && sourceItem.WeenieType != WeenieType.Gem && sourceItem.WeenieType != WeenieType.SpellTransferScroll)
             {
