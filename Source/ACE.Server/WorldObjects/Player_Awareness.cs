@@ -101,7 +101,7 @@ namespace ACE.Server.WorldObjects
             if (creature == null || creature.PlayerKillerStatus == PlayerKillerStatus.RubberGlue || creature.PlayerKillerStatus == PlayerKillerStatus.Protected || distanceSquared > creature.VisualAwarenessRangeSq || !creature.IsDirectVisible(this))
                 return true;
 
-            uint difficulty;
+            var difficulty = (uint)(EnterSneakingDifficulty + creature.Level ?? 1);
 /// Removing immediate failure from sneak from equation for more reliable detaunt effect
      ///   var angle = Math.Abs(creature.GetAngle(this));
         ///  if (angle < 45)
@@ -112,16 +112,16 @@ namespace ACE.Server.WorldObjects
                    /// return false;
                /// }
               if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
-                    difficulty = (uint)((creature.Level ?? 1) * 0.2f);
+                    difficulty *= 3;
                 else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
-                    difficulty = (uint)((creature.Level ?? 1) * 0.15f);
+                    difficulty *= 2;
                 else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
-                    difficulty = (uint)((creature.Level ?? 1) * 0.13f);
+                    difficulty *= 1;
                 else
-                    difficulty = (uint)((creature.Level ?? 1) * 0.0f);
+                    difficulty = (uint)(difficulty * 0.1f);
             }
         ///    else
-           ///     difficulty = (uint)((creature.Level ?? 1) * 0.1f);
+           ///      difficulty = (uint)(difficulty * 0.5f);
 
             return TestSneaking(difficulty, failureMessage);
         }
@@ -139,7 +139,7 @@ namespace ACE.Server.WorldObjects
 
         public bool TestSneaking(uint difficulty, string failureMessage)
         {
-            if(TestSneakingInternal(difficulty) != SneakingTestResult.Success)
+            if (TestSneakingInternal(difficulty) != SneakingTestResult.Success)
             {
                 EndSneaking(failureMessage);
                 return false;
@@ -196,6 +196,33 @@ namespace ACE.Server.WorldObjects
                 return true;
             }
             return false;
+     
+        public void Misdirect()
+        {
+            if (!IsSneaking)
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat("You must be sneaking to use this technique.", ChatMessageType.Broadcast));
+                return;
+            }
+
+            Session.Network.EnqueueSend(new GameMessageSystemChat("You attempt to misdirect the attention of those around you.", ChatMessageType.Broadcast));
+            foreach (var creature in ObjMaint.GetVisibleObjectsValuesOfTypeCreature())
+            {
+                if (creature.Guid.IsPlayer() || creature.CombatMode != CombatMode.NonCombat || creature.PlayerKillerStatus == PlayerKillerStatus.RubberGlue || creature.PlayerKillerStatus == PlayerKillerStatus.Protected)
+                    continue;
+
+                if (GetDistance(creature) < 20 && creature.IsDirectVisible(this))
+                {
+                    var difficulty = (uint)(EnterSneakingDifficulty + creature.Level ?? 1);
+                    if (TestSneaking(difficulty, $"{creature.Name} sees you! You stop sneaking."))
+                        creature.TurnTo(Location);
+                    else
+                    {
+                        AlertMonster(creature);
+                        break;
+                    }
+                }
+            }
         }
     }
 }
