@@ -564,7 +564,7 @@ namespace ACE.Server.WorldObjects
                 if(difficulty <= 10)
                     difficulty = 35;
                 else
-                    difficulty += 50;
+                    difficulty += 25;
             }
 
             if (MagicState.IsCombatCasting)
@@ -1005,9 +1005,10 @@ namespace ACE.Server.WorldObjects
                                                         if (castSpellId != SpellId.Undef)
                                                         {
                                                             var castSpell = new Spell(castSpellId);
-                                                            var mirrorSpellChain = new ActionChain();
-                                                            mirrorSpellChain.AddDelaySeconds(0.3);
-                                                            mirrorSpellChain.AddAction(this, () =>
+                                                            castSpell.OverrideSchool = (MagicSchool)amulet.LeyLineSchool;
+                                                            var extraSpellChain = new ActionChain();
+                                                            extraSpellChain.AddDelaySeconds(0.3);
+                                                            extraSpellChain.AddAction(this, () =>
                                                             {
                                                                 if (amulet.LeyLineEffectId == (uint)LeyLineEffect.CastExtraSpellSelf)
                                                                     CreatePlayerSpell(this, castSpell, isWeaponSpell);
@@ -1015,7 +1016,7 @@ namespace ACE.Server.WorldObjects
                                                                     CreatePlayerSpell(target, castSpell, isWeaponSpell);
                                                             });
 
-                                                            mirrorSpellChain.EnqueueChain();
+                                                            extraSpellChain.EnqueueChain();
                                                         }
                                                     }
                                                 }
