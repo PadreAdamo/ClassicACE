@@ -81,6 +81,21 @@ namespace ACE.Server.WorldObjects
         }
 
         /// <summary>
+        /// Returns the number of Pierce targets for this weapon
+        /// If cleaving weapon, this is PropertyInt.Cleaving - 1
+        /// </summary>
+        public int PierceTargets
+        {
+            get
+            {
+                if (!IsPiercing)
+                    return 0;
+
+                return GetProperty(PropertyInt.Cleaving).Value - 1;
+            }
+        }
+
+        /// <summary>
         /// Returns the primary weapon equipped by a creature
         /// (melee, missile, or wand)
         /// </summary>
