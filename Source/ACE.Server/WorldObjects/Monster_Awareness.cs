@@ -168,7 +168,7 @@ namespace ACE.Server.WorldObjects
                 else
                 {
                     var defenseSkill = GetCreatureSkill(Skill.AssessCreature);
-                    var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
+                    var avoidChance = 0.5f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
 
                     if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
                     {
@@ -190,6 +190,11 @@ namespace ACE.Server.WorldObjects
             foreach (var targetDistance in targetDistances)
             {
                 target = targetDistance.Target as Player;
+                    //Sneak as a detaunt - Padre
+                    if (target.IsSneaking)
+                    FindNextTarget();
+                    continue;
+                
                 if (target == AttackTarget)
                     continue;
                 else if (target != null && target.IsAttemptingToTaunt)
@@ -202,11 +207,13 @@ namespace ACE.Server.WorldObjects
                     Entity.CreatureSkill skill = target.GetCreatureSkill(Skill.Deception);
 
                     var activationChance = ThreadSafeRandom.Next(0.0f, 1.0f);
-                    if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 1.0)
+                    if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 5.0)
                         continue;
-                    else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 0.5)
+
+                    else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 3.0)
+
                         continue;
-                    else if (activationChance > 0.10)
+                    else if (activationChance > 1.5)
                         continue;
 
                     if (target.attacksReceivedPerSecond >= skill.Current / 60.0f)
@@ -218,7 +225,7 @@ namespace ACE.Server.WorldObjects
                     target.UpdateVitalDelta(target.Mana, -manaCost); // We're past the activation stage so no matter if we succeed or not we consume the mana.
 
                     Entity.CreatureSkill defenseSkill = GetCreatureSkill(Skill.AssessCreature);
-                    var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
+                    var avoidChance = 0.3f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
 
                     if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
                     {
@@ -271,7 +278,7 @@ namespace ACE.Server.WorldObjects
 
                 var targetDistances = BuildTargetDistance(visibleTargets);
                 var tauntedBy = CheckForTauntingTargets(targetDistances); // We use the sorted by distance list here so closer targets roll first and thus have higher chance of taunting the monster.
-
+                                
                 if (tauntedBy != null)
                 {
                     // We've been taunted! Ignore our default tactic and attack this target!
@@ -311,6 +318,8 @@ namespace ACE.Server.WorldObjects
                             if (topDamager != null)
                                 AttackTarget = topDamager;
                             break;
+                           
+                                
 
                         // these below don't seem to be used in PY16 yet...
 
@@ -392,9 +401,9 @@ namespace ACE.Server.WorldObjects
 
                 // can only target other monsters with Tolerance.Monster -- cannot target players or combat pets
                 if (Tolerance.HasFlag(Tolerance.Monster) && (creature is Player || creature is CombatPet))
-                    continue;
-
-                if (creature is Player player && player.TestSneaking(this, distSq, $"{Name} sees you! You stop sneaking."))
+                    continue;    
+                
+               if (creature is Player player && player.TestSneaking(this, distSq, $"{Name} sees you! You stop sneaking."))
                     continue;
 
                 visibleTargets.Add(creature);

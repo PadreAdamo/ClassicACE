@@ -703,6 +703,9 @@ namespace ACE.Server.Command.Handlers
 
         public static void SingleRecommendation(Session session, bool failSilently)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return;
+
             var validRecommendations = BuildRecommendationList(session.Player);
 
             var level = session.Player?.Level ?? 1;
@@ -1397,9 +1400,10 @@ namespace ACE.Server.Command.Handlers
             var leaderboard = new List<LeaderboardEntry>();
             foreach (var entry in living)
             {
-                var level = entry.GetProperty(PropertyInt.Level) ?? 1;
-                if (level >= 999)
+                if (entry.Account.AccessLevel > 0)
                     continue;
+
+                var level = entry.GetProperty(PropertyInt.Level) ?? 1;
 
                 var leaderboardEntry = new LeaderboardEntry();
                 leaderboardEntry.Living = true;
@@ -1418,9 +1422,6 @@ namespace ACE.Server.Command.Handlers
                 var obituaryEntries = DatabaseManager.Shard.BaseDatabase.GetHardcoreDeathsByGameplayMode(gameplayMode);
                 foreach (var entry in obituaryEntries)
                 {
-                    if (entry.CharacterLevel >= 999)
-                        continue;
-
                     if (entry.GameplayMode == (int)gameplayMode)
                     {
                         var leaderboardEntry = new LeaderboardEntry();
@@ -1459,12 +1460,14 @@ namespace ACE.Server.Command.Handlers
             }
 
             bool IsPkLeaderboard = true;
-            if (parameters.Length > 0 && parameters[0] == "npk")
-                IsPkLeaderboard = false;
-
             bool onlyLiving = false;
-            if (parameters.Length > 1 && parameters[1] == "living")
-                onlyLiving = true;
+            foreach(var par in parameters)
+            {
+                if (par == "npk")
+                    IsPkLeaderboard = false;
+                else if(par == "living")
+                    onlyLiving = true;
+            }
 
             ulong discordChannel = 0;
             if (parameters.Length > 3 && parameters[2] == "discord")
@@ -1484,6 +1487,70 @@ namespace ACE.Server.Command.Handlers
                 playerCounter++;
 
                 if (playerCounter > 10)
+                    break;
+            }
+            message.Append("-----------------------\n");
+
+            if (discordChannel == 0)
+                CommandHandlerHelper.WriteOutputInfo(session, message.ToString(), ChatMessageType.Broadcast);
+            else
+                DiscordChatBridge.SendMessage(discordChannel, $"`{message.ToString()}`");
+        }
+
+        [CommandHandler("HCTopNPC", AccessLevel.Player, CommandHandlerFlag.None, "List top 10 NPCs by total kills.", "HCTopNPC [minLevel] [maxLevel]")]
+        public static void HandleLeaderboardHCTopNPC(Session session, params string[] parameters)
+        {
+            if (session != null)
+            {
+                if (session.AccessLevel == AccessLevel.Player && DateTime.UtcNow - session.Player.PrevLeaderboardHCXPCommandRequestTimestamp < TimeSpan.FromMinutes(1))
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat("You have used this command too recently!", ChatMessageType.Broadcast));
+                    return;
+                }
+                session.Player.PrevLeaderboardHCXPCommandRequestTimestamp = DateTime.UtcNow;
+            }
+
+            int minLevel = 1;
+            if (parameters.Length > 0)
+                int.TryParse(parameters[0], out minLevel);
+
+            int maxLevel = 275;
+            if (parameters.Length > 1)
+                int.TryParse(parameters[1], out maxLevel);
+
+            ulong discordChannel = 0;
+            if (parameters.Length > 3 && parameters[2] == "discord")
+                ulong.TryParse(parameters[3], out discordChannel);
+
+            var leaderboard = new Dictionary<string, int>();
+            var obituaryEntries = DatabaseManager.Shard.BaseDatabase.GetHardcoreDeaths();
+            foreach (var entry in obituaryEntries)
+            {
+                if (entry.CharacterLevel < minLevel || entry.CharacterLevel > maxLevel)
+                    continue;
+
+                if (!entry.WasPvP)
+                {
+                    if (!leaderboard.TryGetValue(entry.KillerName, out var kills))
+                        leaderboard.Add(entry.KillerName, 1);
+                    else
+                        leaderboard[entry.KillerName]++;
+                }
+            }
+
+            var sorted = from entry in leaderboard orderby entry.Value descending select entry;
+
+            StringBuilder message = new StringBuilder();
+            message.Append($"Top Hardcore Character Killers - Levels {minLevel} to {maxLevel}:\n");
+            message.Append("-----------------------\n");
+            uint counter = 1;
+            foreach (var entry in sorted)
+            {
+                var label = counter < 10 ? $" {counter}." : $"{counter}.";
+                message.Append($"{label} {entry.Key} - {entry.Value} kill{(entry.Value != 1 ? "s" : "")}\n");
+                counter++;
+
+                if (counter > 10)
                     break;
             }
             message.Append("-----------------------\n");

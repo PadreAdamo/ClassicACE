@@ -124,19 +124,32 @@ namespace ACE.Server.WorldObjects
             if (IsPKDeath(topDamager))
             {
                 pkPlayer.PkTimestamp = Time.GetUnixTime();
-                pkPlayer.PlayerKillsPk++;
-
-                string locationString = Landblock.GetLocationString(Location.LandblockId.Landblock);
 
                 var globalPKDe = $"{lastDamager.Name} has defeated {Name}!";
 
                 //if ((Location.Cell & 0xFFFF) < 0x100)
                 //    globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
 
-                if(locationString == "" && (Location.Cell & 0xFFFF) < 0x100)
-                    globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
+                if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                {
+                    pkPlayer.PlayerKillsPk++;
+
+                    if ((Location.Cell & 0xFFFF) < 0x100)
+                        globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
+                }
                 else
-                    globalPKDe += $" The kill occured{locationString}.";
+                {                       
+                    if ((pkPlayer.Level ?? 1) > (Level ?? 1) + 10)
+                        pkPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"The leaderboards will not take into account this kill as {Name}'s level was too low for you!", ChatMessageType.Broadcast));
+                    else
+                        pkPlayer.PlayerKillsPk++;
+
+                    string locationString = Landblock.GetLocationString(Location.LandblockId.Landblock);
+                    if (locationString == "" && (Location.Cell & 0xFFFF) < 0x100)
+                        globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
+                    else
+                        globalPKDe += $" The kill occured{locationString}.";
+                }
 
                 string webhookMsg = new String(globalPKDe);
 
@@ -154,7 +167,10 @@ namespace ACE.Server.WorldObjects
                     pkPlayer.PlayerKillsPkl++;
                 else
                 {
-                    pkPlayer.PlayerKillsPkl++;
+                    if((pkPlayer.Level ?? 1) > (Level ?? 1) + 10)
+                        pkPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"The leaderboards will not take into account this kill as {Name}'s level was too low for you!", ChatMessageType.Broadcast));
+                    else
+                        pkPlayer.PlayerKillsPkl++;
 
                     var namesList = new List<string>();
 
@@ -247,7 +263,7 @@ namespace ACE.Server.WorldObjects
                     wasPvP = topDamager.IsPlayer;
                 }
 
-                DatabaseManager.Shard.BaseDatabase.LogHardcoreDeath(Account.AccountId, Guid.Full, Name, Level ?? 1, killerName, killerLevel, CurrentLandblock.Id.Raw >> 16, (int)GameplayMode, wasPvP, PlayerKillsPkl ?? 0, TotalExperience ?? 0, Age ?? 0, DateTime.Now, MonarchId);
+                DatabaseManager.Shard.BaseDatabase.LogHardcoreDeath(Account, Guid.Full, Name, Level ?? 1, killerName, killerLevel, CurrentLandblock.Id.Raw >> 16, (int)GameplayMode, wasPvP, PlayerKillsPkl ?? 0, TotalExperience ?? 0, Age ?? 0, DateTime.Now, MonarchId);
             }
 
             UpdateVital(Health, 0);
@@ -508,7 +524,7 @@ namespace ACE.Server.WorldObjects
             suicideInProgress = true;
 
             if (PropertyManager.GetBool("suicide_instant_death").Item)
-                Die(new DamageHistoryInfo(this), DamageHistory.TopDamager);
+                TakeDamage(this, DamageType.Health, Health.Current);
             else
                 HandleSuicide(NumDeaths);
         }
@@ -537,7 +553,7 @@ namespace ACE.Server.WorldObjects
                 suicideChain.EnqueueChain();
             }
             else
-                Die(new DamageHistoryInfo(this), DamageHistory.TopDamager);
+                TakeDamage(this, DamageType.Health, Health.Current);
         }
 
         public List<WorldObject> CalculateDeathItems(Corpse corpse, bool wasPvP)
