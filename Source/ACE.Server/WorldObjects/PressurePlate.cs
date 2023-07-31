@@ -92,10 +92,12 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
             }
+
             NextActivationIsFromUse = false;
 
             // prevent continuous event stream
             // TODO: should this go in base.OnActivate()?
+
 
             player.EnqueueBroadcast(new GameMessageSound(player.Guid, UseSound));
 
