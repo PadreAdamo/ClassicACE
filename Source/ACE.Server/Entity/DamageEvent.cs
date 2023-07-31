@@ -341,7 +341,7 @@ namespace ACE.Server.Entity
                     if (playerDefender != null)
                     {
                         if (defenderTechniqueId == TacticAndTechniqueType.Riposte)
-                            CriticalChance += 0.10f; // Extra chance of receiving critical hits while using the Riposte technique.
+                            CriticalChance += 0.05f; // Extra chance of receiving critical hits while using the Riposte technique.
                     }
                 }
             }
