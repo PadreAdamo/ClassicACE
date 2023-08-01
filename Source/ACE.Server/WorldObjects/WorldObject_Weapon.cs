@@ -86,7 +86,7 @@ namespace ACE.Server.WorldObjects
         public bool IsPiercing 
         { 
             get => GetProperty(PropertyInt.Cleaving) != null;
-            set { if (weapon.Spear == Skill.Spear) ?? true}
+            set { if (WeaponType.Spear && Skill.Spear) ?? true}
         }
         
         /// <summary>
