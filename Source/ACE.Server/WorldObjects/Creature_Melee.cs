@@ -168,7 +168,7 @@ namespace ACE.Server.WorldObjects
         /// Performs a piercing attack which follows-through the 1st primary target to the secondary second as long as the secondary target is 90 degrees, essentially in a straight-line.
         /// </summary>
         /// <returns>The list of pierce targets to hit with this attack</returns>
-        public List<Creature> GetPierceTarget(Creature target, WorldObject weapon)
+        public List<Creature>GetPierceTarget(Creature target, WorldObject weapon)
         {
             var player = this as Player;
 
@@ -179,7 +179,7 @@ namespace ACE.Server.WorldObjects
             visible.Sort(DistanceComparator);
 
             var pierceTargets = new List<Creature>();
-            var totalPierces = weapon.pierceTargets;
+            var totalPierces = weapon.PierceTargets;
 
             foreach (var obj in visible)
             {
