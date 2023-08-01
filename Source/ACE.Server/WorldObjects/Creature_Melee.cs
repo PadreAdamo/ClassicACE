@@ -159,5 +159,64 @@ namespace ACE.Server.WorldObjects
             }
             return cleaveTargets;
         }
+                public static readonly float PierceRange = 5.0f;
+        public static readonly float PierceRangeSq = PierceRange * PierceRange;
+        public static readonly float PierceAngle = 90.0f;
+
+        public static readonly float PierceCylRange = 2.0f;
+
+        /// <summary>
+        /// Performs a piercing attack which follows-through the 1st primary target to the secondary second as long as the secondary target is 90 degrees, essentially in a straight-line.
+        /// </summary>
+        /// <returns>The list of pierce targets to hit with this attack</returns>
+        public List<Creature> GetPierceTarget(Creature target, WorldObject weapon)
+        {
+            var player = this as Player;
+
+            if (!weapon.IsPiercing) return null;
+
+            // sort visible objects by ascending distance
+            var visible = PhysicsObj.ObjMaint.GetVisibleObjectsValuesWhere(o => o.WeenieObj.WorldObject != null);
+            visible.Sort(DistanceComparator);
+
+            var pierceTargets = new List<Creature>();
+            var totalPierces = weapon.PierceTargets;
+
+            foreach (var obj in visible)
+            {
+                // piercing skips original target
+                if (obj.ID == target.PhysicsObj.ID)
+                    continue;
+
+                // only pierce creatures
+                var creature = obj.WeenieObj.WorldObject as Creature;
+                if (creature == null || creature.Teleporting || creature.IsDead) continue;
+
+                if (player != null && player.CheckPKStatusVsTarget(creature, null) != null)
+                    continue;
+
+                if (!creature.Attackable && creature.TargetingTactic == TargetingTactic.None || creature.Teleporting)
+                    continue;
+
+                if (creature is CombatPet && (player != null || this is CombatPet))
+                    continue;
+
+                // no objects in pierce range
+                var cylDist = GetCylinderDistance(creature);
+                if (cylDist > PierceCylRange)
+                    return pierceTargets;
+
+                // only pierce in front of attacker
+                var angle = GetAngle(creature);
+                if (Math.Abs(angle) > PierceAngle / 2.0f)
+                    continue;
+
+                // found cleavable object
+                pierceTargets.Add(creature);
+                if (pierceTargets.Count == totalPierces)
+                    break;
+            }
+            return PierceTargets;
+        }
     }
 }

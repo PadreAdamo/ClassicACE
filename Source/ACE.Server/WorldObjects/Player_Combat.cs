@@ -1056,6 +1056,7 @@ namespace ACE.Server.WorldObjects
         {
             var strAndEnd = Strength.Base + 2 * Endurance.Base;
 
+
             if (strAndEnd > 380)        return "Indomitable";
             else if (strAndEnd > 340)   return "Resilient";
             else if (strAndEnd > 260)   return "Hardy";

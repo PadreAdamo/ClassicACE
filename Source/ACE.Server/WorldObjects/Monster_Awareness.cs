@@ -207,6 +207,7 @@ namespace ACE.Server.WorldObjects
                     Entity.CreatureSkill skill = target.GetCreatureSkill(Skill.Deception);
 
                     var activationChance = ThreadSafeRandom.Next(0.0f, 1.0f);
+
                     if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 5.0)
                         continue;
 
