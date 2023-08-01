@@ -159,10 +159,9 @@ namespace ACE.Server.WorldObjects
             }
             return cleaveTargets;
         }
-                public static readonly float PierceRange = 5.0f;
+        public static readonly float PierceRange = 5.0f;
         public static readonly float PierceRangeSq = PierceRange * PierceRange;
         public static readonly float PierceAngle = 90.0f;
-
         public static readonly float PierceCylRange = 2.0f;
 
         /// <summary>
@@ -212,8 +211,8 @@ namespace ACE.Server.WorldObjects
                     continue;
 
                 // found cleavable object
-                pierceTargets.Add(creature);
-                if (pierceTargets.Count == totalPierces)
+                PierceTargets.Add(creature);
+                if (PierceTargets.Count == totalPierces)
                     break;
             }
             return PierceTargets;
