@@ -115,7 +115,7 @@ namespace ACE.Server.WorldObjects
             var player = this as Player;
 
             if (!weapon.IsCleaving) return null;
-
+       
             // sort visible objects by ascending distance
             var visible = PhysicsObj.ObjMaint.GetVisibleObjectsValuesWhere(o => o.WeenieObj.WorldObject != null);
             visible.Sort(DistanceComparator);
