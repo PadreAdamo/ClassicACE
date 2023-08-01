@@ -91,6 +91,15 @@ namespace ACE.Server.WorldObjects
             set { if (!value) RemoveProperty(PropertyBool.IsSpearWeapon); else SetProperty(PropertyBool.IsSpearWeapon, value); }
         }
 
+        public bool IsSpearWeapon
+        {
+            get
+            {
+                if ((IsSpearWeaponProperty || !(WeaponSkill != Skill.Spear)
+                    return true;
+                return false;
+            }
+        }
    //     public bool IsSpearWeapon
    //     {
    //         get
