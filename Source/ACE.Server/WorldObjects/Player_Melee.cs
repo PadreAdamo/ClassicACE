@@ -422,7 +422,7 @@ namespace ACE.Server.WorldObjects
                     {
                         var pierce = GetPierceTarget (creature, weapon);
 
-                        foreach (var CleaveHit in pierce)
+                        foreach (var cleaveHit in pierce)
                         {
                             //target procs don't happen for piercing/cleaving
                             DamageTarget(cleaveHit, weapon);
