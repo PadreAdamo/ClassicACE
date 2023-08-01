@@ -121,11 +121,8 @@ namespace ACE.Server.WorldObjects
                             Creature creatureAttacker = attacker as Creature;
                             if (creatureAttacker != null)
                             {
-
-                              // Base chance is below for Riposte
-                                //  var chance = 0.4f;
-                                var chance = 1.0F;
-                                if (chance > ThreadSafeRandom.Next(0.0f, 1.0f)) && GetDistance(creatureAttacker) < 3)
+                                var chance = 1.5f;
+                                if (chance > ThreadSafeRandom.Next(0.0f, 1.0f) && GetDistance(creatureAttacker) < 3)
                                 {
                                     // Chance of striking back at the target when successfully evading an attack while using the Riposte technique.
                                     Session.Network.EnqueueSend(new GameMessageSystemChat($"You see an opening and quickly strike back at the {attacker.Name}!", ChatMessageType.CombatSelf));
@@ -141,12 +138,8 @@ namespace ACE.Server.WorldObjects
                         Creature creatureAttacker = attacker as Creature;
                         if (creatureAttacker != null)
                         {
-
-                         //base Riposte chance is below
-                            //   var chance = 0.4f;
-                            var chance = 1.0F;
+                            var chance = 0.1f;
                             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f) && GetDistance(creatureAttacker) < 3)
-
                             {
                                 // Chance of striking back at the target while dual wielding when receiving an attack.
                                 Session.Network.EnqueueSend(new GameMessageSystemChat($"You see an opening and quickly strike back at the {attacker.Name} with your offhand!", ChatMessageType.CombatSelf));
