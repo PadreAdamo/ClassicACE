@@ -227,4 +227,5 @@ namespace ACE.Server.WorldObjects
             }
         }
     }
+   }
 }
