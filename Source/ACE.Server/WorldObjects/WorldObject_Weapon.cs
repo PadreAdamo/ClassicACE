@@ -95,7 +95,7 @@ namespace ACE.Server.WorldObjects
         {
             get
             {
-                if ((IsSpearWeaponProperty || !(WeaponSkill != Skill.Spear)
+                if (IsSpearWeaponProperty || !(WeaponSkill != Skill.Spear))
                     return true;
                 return false;
             }
