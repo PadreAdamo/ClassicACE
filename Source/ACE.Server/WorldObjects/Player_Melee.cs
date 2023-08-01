@@ -423,8 +423,9 @@ namespace ACE.Server.WorldObjects
                         var pierce = GetPierceTarget (creature, weapon);
 
                         foreach (var pierceHit in pierce)
-                  
-               
+                        {
+                            DamageTarget(pierceHit, weapon);                 
+                        }
                     }
                 });
 
