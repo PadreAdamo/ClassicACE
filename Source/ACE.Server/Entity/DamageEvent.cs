@@ -109,7 +109,7 @@ namespace ACE.Server.Entity
         public float DamageBlocked;
 
         //Damage reduction for the extra pierced target from Spear
-        public float PierceTargets;
+        //public float PierceTargets;
 
         // creature attacker
         public MotionCommand? AttackMotion;
