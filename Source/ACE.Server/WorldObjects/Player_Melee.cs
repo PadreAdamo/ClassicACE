@@ -420,7 +420,7 @@ namespace ACE.Server.WorldObjects
 
                     if (weapon !=null && weapon.IsPiercing)
                     {
-                        var pierce = GetCleaveTarget (creature, weapon);
+                        var pierce = GetPierceTarget (creature, weapon);
 
                         foreach (var pierceHit in pierce)
                         {
