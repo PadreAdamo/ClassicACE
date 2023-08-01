@@ -197,7 +197,7 @@ namespace ACE.Server.WorldObjects
                 return true;
             }
             return false;
-
+        }
 
         public void Misdirect()
         {
@@ -227,4 +227,4 @@ namespace ACE.Server.WorldObjects
             }
         }
     }
-   }
+}
