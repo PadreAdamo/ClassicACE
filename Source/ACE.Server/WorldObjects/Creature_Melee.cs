@@ -203,7 +203,7 @@ namespace ACE.Server.WorldObjects
                 // no objects in pierce range
                 var cylDist = GetCylinderDistance(creature);
                 if (cylDist > PierceCylRange)
-                    return pierceTargets;
+                    return PierceTargets;
 
                 // only pierce in front of attacker
                 var angle = GetAngle(creature);
