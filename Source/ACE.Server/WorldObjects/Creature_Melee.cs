@@ -179,7 +179,7 @@ namespace ACE.Server.WorldObjects
             visible.Sort(DistanceComparator);
 
             var pierceTargets = new List<Creature>();
-            var totalPierces = weapon.PierceTargets;
+            var totalPierces = weapon.pierceTargets;
 
             foreach (var obj in visible)
             {
@@ -203,7 +203,7 @@ namespace ACE.Server.WorldObjects
                 // no objects in pierce range
                 var cylDist = GetCylinderDistance(creature);
                 if (cylDist > PierceCylRange)
-                    return PierceTargets;
+                    return pierceTargets;
 
                 // only pierce in front of attacker
                 var angle = GetAngle(creature);
@@ -211,11 +211,11 @@ namespace ACE.Server.WorldObjects
                     continue;
 
                 // found cleavable object
-                PierceTargets.Add(creature);
-                if (PierceTargets.Count == totalPierces)
+                pierceTargets.Add(creature);
+                if (pierceTargets.Count == totalPierces)
                     break;
             }
-            return PierceTargets;
+            return pierceTargets;
         }
     }
 }
