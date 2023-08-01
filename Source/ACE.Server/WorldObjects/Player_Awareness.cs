@@ -198,6 +198,7 @@ namespace ACE.Server.WorldObjects
             }
             return false;
 
+
         public void Misdirect()
         {
             if (!IsSneaking)
