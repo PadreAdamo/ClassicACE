@@ -60,7 +60,8 @@ namespace ACE.Server.Network.Structure
                     else
                         Damage *= 2;
                 }
-                else if(weapon.PierceTargets > 0)
+                // Spear Piercing
+                else if (weapon.WeaponSkill == SKill.Spear && weapon.PierceTargets > 0)
                     Damage *= (uint)((weapon.PierceTargets + 1) * 1);
                 else if(weapon.CleaveTargets > 0)
                     Damage *= (uint)((weapon.CleaveTargets + 1) * 2);
