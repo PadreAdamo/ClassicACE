@@ -197,34 +197,6 @@ namespace ACE.Server.WorldObjects
                 return true;
             }
             return false;
-     
-        public void Misdirect()
-        {
-            if (!IsSneaking)
-            {
-                Session.Network.EnqueueSend(new GameMessageSystemChat("You must be sneaking to use this technique.", ChatMessageType.Broadcast));
-                return;
-            }
-
-            Session.Network.EnqueueSend(new GameMessageSystemChat("You attempt to misdirect the attention of those around you.", ChatMessageType.Broadcast));
-            foreach (var creature in ObjMaint.GetVisibleObjectsValuesOfTypeCreature())
-            {
-                if (creature.Guid.IsPlayer() || creature.CombatMode != CombatMode.NonCombat || creature.PlayerKillerStatus == PlayerKillerStatus.RubberGlue || creature.PlayerKillerStatus == PlayerKillerStatus.Protected)
-                    continue;
-
-                if (GetDistance(creature) < 20 && creature.IsDirectVisible(this))
-                {
-                    var difficulty = (uint)(EnterSneakingDifficulty + creature.Level ?? 1);
-                    if (TestSneaking(difficulty, $"{creature.Name} sees you! You stop sneaking."))
-                        creature.TurnTo(Location);
-                    else
-                    {
-                        AlertMonster(creature);
-                        break;
-                    }
-                }
-            }
-        }
 
         public void Misdirect()
         {
