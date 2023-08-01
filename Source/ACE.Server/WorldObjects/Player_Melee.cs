@@ -417,6 +417,17 @@ namespace ACE.Server.WorldObjects
                             DamageTarget(cleaveHit, weapon);
                         }
                     }
+
+                    if (weapon !=null && weapon.IsPiercing)
+                    {
+                        var pierce = GetPierceTarget (creature, weapon);
+
+                        foreach (var CleaveHit in pierce)
+                        {
+                            //target procs don't happen for piercing/cleaving
+                            DamageTarget(cleaveHit, weapon);
+                        }
+                    }
                 });
 
                 //if (numStrikes == 1 || TwoHandedCombat)
