@@ -228,4 +228,3 @@ namespace ACE.Server.WorldObjects
         }
     }
    }
-}
