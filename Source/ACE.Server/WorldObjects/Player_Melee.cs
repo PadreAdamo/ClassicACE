@@ -418,13 +418,13 @@ namespace ACE.Server.WorldObjects
                         }
                     }
 
-                    if (weapon !=null && weapon.IsPiercing)
+                    if (weapon.IsPiercing)
                     {
-                        var pierce = GetPierceTarget (creature, weapon);
+                        var pierce = GetPierceTarget(creature, weapon);
 
                         foreach (var pierceHit in pierce)
                         {
-                            DamageTarget(pierceHit, weapon);                 
+                            DamageTarget(pierceHit, weapon / 0.5f);                 
                         }
                     }
                 });
