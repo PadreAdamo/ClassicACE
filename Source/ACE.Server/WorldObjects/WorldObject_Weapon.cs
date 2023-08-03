@@ -89,7 +89,7 @@ namespace ACE.Server.WorldObjects
            {
                get
                 {
-                if ((IsPierceWeapon || (weapon.WeaponSkill == Skill.Spear))
+                if ((IsPierceWeapon || (weapon.WeaponSkill == Skill.Spear)))
                     return true;
                 return false;
                 }
