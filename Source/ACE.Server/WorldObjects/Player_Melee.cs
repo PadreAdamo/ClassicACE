@@ -424,7 +424,7 @@ namespace ACE.Server.WorldObjects
 
                         foreach (var pierceHit in pierce)
                         {
-                            DamageTarget(pierceHit, weapon / 0.5f);                 
+                            DamageTarget(pierceHit, weapon);                 
                         }
                     }
                 });
