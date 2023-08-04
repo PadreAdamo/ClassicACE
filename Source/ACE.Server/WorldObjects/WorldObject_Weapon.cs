@@ -83,21 +83,11 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Returns TRUE if this weapon pierces
         /// </summary>
-        public bool IsPiercing { get => GetProperty(PropertyInt.Cleaving) && IsPierceWeapon && !IsTwoHanded; }
-            
-        public bool IsPierceWeapon
-           {
-               get
-                {
-                if ((IsPierceWeapon || (weapon.WeaponSkill == Skill.Spear)))
-                    return true;
-                return false;
-                }
-            }
-        
+        public bool IsPiercing {weapon.WeaponSkill == Skill.Spear && !IsTwoHanded; }
+
         /// <summary>
         /// Returns the number of Pierce targets for this weapon
-        /// If cleaving weapon, this is PropertyInt.Cleaving - 1
+        /// Removed the tie to propertyint cleaving
         /// </summary>
         public int PierceTargets
         {
@@ -105,8 +95,8 @@ namespace ACE.Server.WorldObjects
             {
                 if (!IsPiercing)
                     return 0;
-
-                return GetProperty(PropertyInt.Cleaving).Value - 1;
+                else
+                return 1;
             }
         }
 
