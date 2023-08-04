@@ -215,8 +215,8 @@ namespace ACE.Server.Managers
         public static double NextHotDungeonRoll = 0;
         public static double NextHotDungeonEnd = 0;
 
-        private static double HotDungeonInterval = 7200;
-        private static double HotDungeonDuration = 7140;
+        private static double HotDungeonInterval = 7800;
+        private static double HotDungeonDuration = 7200;
         private static double HotDungeonRollDelay = 1200;
         private static double HotDungeonChance = 0.33;
         public static void HotDungeonTick(double currentUnixTime)
@@ -330,6 +330,7 @@ namespace ACE.Server.Managers
                         HotDungeonDescription = $"Extra experience rewards dungeon: {dungeonName} located {dungeonDirections}. Dungeon level: {dungeonLevel:N0}.";
 
                         NextHotDungeonEnd = Time.GetFutureUnixTime(HotDungeonDuration);
+                        NextHotDungeonRoll = Time.GetFutureUnixTime(HotDungeonInterval);
 
                         var timeRemaining = TimeSpan.FromSeconds(HotDungeonDuration).GetFriendlyString();
 
@@ -407,6 +408,7 @@ namespace ACE.Server.Managers
         private static double FireSaleTownDuration = 1200;
         private static double FireSaleTownChance = 0.20;
         public static double FireSaleSellPrice = 1.25;
+        public static int FireSaleItemStockAmountMultiplier = 3;
 
         public static void FireSaleTick(double currentUnixTime)
         {
@@ -464,6 +466,7 @@ namespace ACE.Server.Managers
                     FireSaleTownDescription = $"Current Fire Sale Town: {FireSaleTownName}.";
 
                     NextFireSaleTownEnd = Time.GetFutureUnixTime(FireSaleTownDuration);
+                    NextFireSaleTownRoll = Time.GetFutureUnixTime(FireSaleTownInterval);
 
                     var timeRemaining = TimeSpan.FromSeconds(FireSaleTownDuration).GetFriendlyString();
 
