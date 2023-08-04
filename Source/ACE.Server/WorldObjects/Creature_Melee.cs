@@ -161,7 +161,7 @@ namespace ACE.Server.WorldObjects
         }
         public static readonly float PierceRange = 5.0f;
         public static readonly float PierceRangeSq = PierceRange * PierceRange;
-        public static readonly float PierceAngle = 93.0f;
+        public static readonly float PierceAngle = 30.0f;
         public static readonly float PierceCylRange = 1.0f;
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace ACE.Server.WorldObjects
 
                 // only pierce in front of attacker
                 var angle = GetAngle(creature);
-                if (Math.Abs(angle) < PierceAngle / 1.0f)
+                if (Math.Abs(angle) > PierceAngle / 1.0f)
                     continue;
 
                 // found cleavable object
