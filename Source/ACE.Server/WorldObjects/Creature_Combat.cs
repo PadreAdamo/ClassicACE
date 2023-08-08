@@ -730,7 +730,17 @@ namespace ACE.Server.WorldObjects
                     AttacksReceivedWithoutBeingAbleToCounter++;
                 }
             }
+             if (attackerAsCreature != null)
+            {
+                attackerAsCreature.TryCastMaceDebuff(this, attackType);
 
+                if (!Guid.IsPlayer() && attacker == AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
+                {
+                    if (AttacksReceivedWithoutBeingAbleToCounter == 0)
+                        NextNoCounterResetTime = Time.GetFutureUnixTime(NoCounterInterval);
+                    AttacksReceivedWithoutBeingAbleToCounter++;
+                }
+            }
             numRecentAttacksReceived++;
         }
 
