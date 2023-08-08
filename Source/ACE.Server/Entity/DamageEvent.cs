@@ -316,7 +316,11 @@ namespace ACE.Server.Entity
 
                         if (Weapon != null && Weapon.IsTwoHanded)
                             CriticalChance += 0.05f + playerAttacker.ScaleWithPowerAccuracyBar(0.05f);
-
+                        
+                        /// Bonus to Axe for critical hit chance
+                        if (Weapon.Axe != Weapon.IsTwohanded)
+                            CriticalChance += 0.08f playerAttacker.ScaleWithPowerAccuracyBar(0.10f);
+                        
                         if (isAttackFromSneaking)
                         {
                             CriticalChance = 1.0f;
@@ -374,7 +378,7 @@ namespace ACE.Server.Entity
                     // verify: CriticalMultiplier only applied to the additional crit damage,
                     // whereas CD/CDR applied to the total damage (base damage + additional crit damage)
                     CriticalDamageMod = 1.0f + WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender, pkBattle);
-
+                    
                     CriticalDamageRatingMod = Creature.GetPositiveRatingMod(attacker.GetCritDamageRating());
 
                     // recklessness excluded from crits
