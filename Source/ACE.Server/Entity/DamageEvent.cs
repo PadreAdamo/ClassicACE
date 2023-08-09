@@ -318,7 +318,7 @@ namespace ACE.Server.Entity
                             CriticalChance += 0.05f + playerAttacker.ScaleWithPowerAccuracyBar(0.05f);
                         
                         /// Bonus to Axe for critical hit chance
-                        if (Weapon = Skill.Axe && !Weapon.IsTwoHanded)
+                        if (Weapon = Skill.Axe && Weapon != IsTwoHanded)
                             CriticalChance += 0.08f + playerAttacker.ScaleWithPowerAccuracyBar(0.08f);
                         
                         if (isAttackFromSneaking)
