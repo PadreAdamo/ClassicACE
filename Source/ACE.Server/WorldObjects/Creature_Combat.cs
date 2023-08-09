@@ -1487,11 +1487,11 @@ namespace ACE.Server.WorldObjects
                         break;                                    
                     case CombatType.Melee:
                         spellId = SpellId.ClumsinessOther1;
-                        spellType = "melee" && "missile";
+                        spellType = "melee";
                         break;
                     case CombatType.Missile:
                         spellId = SpellId.FrailtyOther1;
-                        spellType = "melee" && "magic" && "missile";
+                        spellType = "missile";
                         break;
                     case CombatType.Missile:
                         spellId = SpellId.SlownessOther1;
@@ -1513,27 +1513,27 @@ namespace ACE.Server.WorldObjects
                 switch (spellRNG)
                 {
                     default:
-                    case CombatType.Melee:
+                    case 1:
                         spellId = SpellId.WeaknessOther1;
                         spellType = "melee";
                         break;                                    
-                    case CombatType.Melee:
+                    case 2:
                         spellId = SpellId.ClumsinessOther1;
-                        spellType = "melee" && "missile";
+                        spellType = "melee";
                         break;
-                    case CombatType.Missile:
+                    case 3:
                         spellId = SpellId.FrailtyOther1;
-                        spellType = "melee" && "magic" && "missile";
+                        spellType = "missile";
                         break;
-                    case CombatType.Missile:
+                    case 4:
                         spellId = SpellId.SlownessOther1;
                         spellType = "missile";
                         break;
-                    case CombatType.Magic:
+                    case 5:
                         spellId = SpellId.BafflementOther1;
                         spellType = "magic";
                         break;
-                    case CombatType.Magic:
+                    case 6:
                         spellId = SpellId.FeeblemindOther1;
                         spellType = "magic";
                         break;
