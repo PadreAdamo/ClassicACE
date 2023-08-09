@@ -1489,7 +1489,7 @@ namespace ACE.Server.WorldObjects
                     case CombatType.Missile:
                         spellId = SpellId.FrailtyOther1;
                         spellId = SpellId.SlownessOther1;
-                        spellType = "missile"
+                        spellType = "missile";
                         break;
                     case CombatType.Magic:
                         spellId = SpellId.BafflementOther1;
