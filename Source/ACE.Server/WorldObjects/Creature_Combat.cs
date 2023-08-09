@@ -1483,26 +1483,17 @@ namespace ACE.Server.WorldObjects
                     default:
                     case CombatType.Melee:
                         spellId = SpellId.WeaknessOther1;
-                        spellType = "melee";
-                        break;                                    
-                    case CombatType.Melee:
                         spellId = SpellId.ClumsinessOther1;
                         spellType = "melee";
-                        break;
+                         break;                                    
                     case CombatType.Missile:
                         spellId = SpellId.FrailtyOther1;
-                        spellType = "missile";
-                        break;
-                    case CombatType.Missile:
                         spellId = SpellId.SlownessOther1;
-                        spellType = "missile";
+                        spellType = "missile"
                         break;
                     case CombatType.Magic:
                         spellId = SpellId.BafflementOther1;
-                        spellType = "magic";
-                        break;
-                    case CombatType.Magic:
-                        spellId = SpellId.FeeblemindOther1;
+                         spellId = SpellId.FeeblemindOther1;
                         spellType = "magic";
                         break;
                 }
@@ -1515,27 +1506,21 @@ namespace ACE.Server.WorldObjects
                     default:
                     case 1:
                         spellId = SpellId.WeaknessOther1;
-                        spellType = "melee";
                         break;                                    
                     case 2:
                         spellId = SpellId.ClumsinessOther1;
-                        spellType = "melee";
                         break;
                     case 3:
                         spellId = SpellId.FrailtyOther1;
-                        spellType = "missile";
                         break;
                     case 4:
                         spellId = SpellId.SlownessOther1;
-                        spellType = "missile";
                         break;
                     case 5:
                         spellId = SpellId.BafflementOther1;
-                        spellType = "magic";
                         break;
                     case 6:
                         spellId = SpellId.FeeblemindOther1;
-                        spellType = "magic";
                         break;
                 }
             }
