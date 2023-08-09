@@ -318,7 +318,7 @@ namespace ACE.Server.Entity
                             CriticalChance += 0.05f + playerAttacker.ScaleWithPowerAccuracyBar(0.05f);
                         
                         /// Bonus to Axe for critical hit chance
-                        if (Weapon.IsAxe)
+                        if (Weapon.Axe)
                             CriticalChance += 0.08f + playerAttacker.ScaleWithPowerAccuracyBar(0.08f);
                         
                         if (isAttackFromSneaking)
@@ -376,7 +376,7 @@ namespace ACE.Server.Entity
                     IsCritical = true;
 
                      /// Axe bonus to criticaldamagemod
-                    if (Weapon.IsAxe)
+                    if (Weapon.Axe)
                         CriticalDamageMod = 1.3f + WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender, pkBattle);
 
                     // verify: CriticalMultiplier only applied to the additional crit damage,
