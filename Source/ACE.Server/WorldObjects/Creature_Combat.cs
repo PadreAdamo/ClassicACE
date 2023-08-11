@@ -1463,11 +1463,6 @@ namespace ACE.Server.WorldObjects
                 Proficiency.OnSuccessUse(sourceAsPlayer, skill, defenseSkill.Current);
 
             string spellType;
-            // 1/6 chance of an attribute debuff being applied
-            SpellId spellId;
-            if (ThreadSafeRandom.Next(1, 6) != 6)
-            {
-               string spellType;
             // 1/5 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
             SpellId spellId;
             if (ThreadSafeRandom.Next(1, 5) != 5)
@@ -1556,8 +1551,7 @@ namespace ACE.Server.WorldObjects
             if (targetAsPlayer != null)
                 targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s Mace skill cracks your armor causing {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
       }
-    }
-        
+            
         /// <summary>
         /// Returns TRUE if the creature receives a +5 DR bonus for this weapon type
         /// </summary>
