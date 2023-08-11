@@ -1555,7 +1555,8 @@ namespace ACE.Server.WorldObjects
                 sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your proficiency with Mace allows you to crack armor causing {spellTypePrefix} {spellType} vulnerability on {target.Name}!", ChatMessageType.Magic));
             if (targetAsPlayer != null)
                 targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s Mace skill cracks your armor causing {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
-        }
+      }
+    }
         
         /// <summary>
         /// Returns TRUE if the creature receives a +5 DR bonus for this weapon type
