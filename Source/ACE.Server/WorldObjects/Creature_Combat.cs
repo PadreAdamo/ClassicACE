@@ -1467,31 +1467,55 @@ namespace ACE.Server.WorldObjects
             SpellId spellId;
             if (ThreadSafeRandom.Next(1, 6) != 6)
             {
+               string spellType;
+            // 1/5 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
+            SpellId spellId;
+            if (ThreadSafeRandom.Next(1, 5) != 5)
+            {
+                switch (combatType)
+                {
+                    default:
+                    case CombatType.Melee:
+                        spellId = SpellId.WeaknessOther1;
+                        spellType = "melee";
+                        break;
+                    case CombatType.Missile:
+                        spellId = SpellId.SlownessOther1;
+                        spellType = "missile";
+                        break;
+                    case CombatType.Magic:
+                        spellId = SpellId.BafflementOther1;
+                        spellType = "magic";
+                        break;
+                }
+            }
+            else
+            {
                 var spellRNGa = ThreadSafeRandom.Next(1, 6);
                 switch (spellRNGa)
                 {
                     default:
                     case 1:
                         spellId = SpellId.WeaknessOther1;
-                        spellType = "Weakness";
+                        spellType = "melee";
                         break;                                    
                     case 2:
                         spellId = SpellId.ClumsinessOther1;
-                        spellType = "Clumsiness";
+                        spellType = "missile";
                         break;
                     case 3:
                         spellId = SpellId.FrailtyOther1;
-                        spellType = "Frailty";
+                        spellType = "magic";
                         break;
-                    case 4:
+          ///          case 4:
                         spellId = SpellId.SlownessOther1;
                         spellType = "Slowness";
                         break;
-                    case 5:
+         ///           case 5:
                         spellId = SpellId.BafflementOther1;
                         spellType = "Bafflement";
                         break;
-                    case 6:
+         ///           case 6:
                         spellId = SpellId.FeeblemindOther1;
                         spellType = "Feeblemind";
                         break;
