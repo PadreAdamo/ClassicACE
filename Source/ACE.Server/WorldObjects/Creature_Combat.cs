@@ -722,18 +722,8 @@ namespace ACE.Server.WorldObjects
             if (attackerAsCreature != null)
             {
                 attackerAsCreature.TryCastAssessDebuff(this, attackType);
-
-                if (!Guid.IsPlayer() && attacker == AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
-                {
-                    if (AttacksReceivedWithoutBeingAbleToCounter == 0)
-                        NextNoCounterResetTime = Time.GetFutureUnixTime(NoCounterInterval);
-                    AttacksReceivedWithoutBeingAbleToCounter++;
-                }
-            }
-             if (attackerAsCreature != null)
-            {
                 attackerAsCreature.TryCastMaceDebuff(this, attackType);
-
+                
                 if (!Guid.IsPlayer() && attacker == AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
                 {
                     if (AttacksReceivedWithoutBeingAbleToCounter == 0)
@@ -741,7 +731,6 @@ namespace ACE.Server.WorldObjects
                     AttacksReceivedWithoutBeingAbleToCounter++;
                 }
             }
-            numRecentAttacksReceived++;
         }
 
         /// <summary>
@@ -1474,34 +1463,12 @@ namespace ACE.Server.WorldObjects
                 Proficiency.OnSuccessUse(sourceAsPlayer, skill, defenseSkill.Current);
 
             string spellType;
-            // 1/5 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
+            // 1/6 chance of an attribute debuff being applied
             SpellId spellId;
             if (ThreadSafeRandom.Next(1, 6) != 6)
             {
-                switch (combatType)
-                {
-                    default:
-                    case CombatType.Melee:
-                        spellId = SpellId.WeaknessOther1;
-                        spellId = SpellId.ClumsinessOther1;
-                        spellType = "melee";
-                         break;                                    
-                    case CombatType.Missile:
-                        spellId = SpellId.FrailtyOther1;
-                        spellId = SpellId.SlownessOther1;
-                        spellType = "missile";
-                        break;
-                    case CombatType.Magic:
-                        spellId = SpellId.BafflementOther1;
-                         spellId = SpellId.FeeblemindOther1;
-                        spellType = "magic";
-                        break;
-                }
-            }
-            else
-            {
-                var spellRNG = ThreadSafeRandom.Next(1, 6);
-                switch (spellRNG)
+                var spellRNGa = ThreadSafeRandom.Next(1, 6);
+                switch (spellRNGa)
                 {
                     default:
                     case 1:
@@ -1532,13 +1499,13 @@ namespace ACE.Server.WorldObjects
             }
 
             var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
-            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 6);
+            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 5);
 
             if (spellLevels.Count == 0)
                 return;
 
-            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 150) / 50.0)), maxUsableSpellLevel);
-            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 50) / 50.0), maxUsableSpellLevel));
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 150) / 25.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 50) / 25.0), maxUsableSpellLevel));
 
             int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
             var spell = new Spell(spellLevels[spellLevel]);
