@@ -1508,17 +1508,17 @@ namespace ACE.Server.WorldObjects
                         spellType = "magic";
                         break;
           ///          case 4:
-                        spellId = SpellId.SlownessOther1;
-                        spellType = "Slowness";
-                        break;
+          ///              spellId = SpellId.SlownessOther1;
+          ///              spellType = "Slowness";
+          ///              break;
          ///           case 5:
-                        spellId = SpellId.BafflementOther1;
-                        spellType = "Bafflement";
-                        break;
+          ///              spellId = SpellId.BafflementOther1;
+          ///              spellType = "Bafflement";
+          ///              break;
          ///           case 6:
-                        spellId = SpellId.FeeblemindOther1;
-                        spellType = "Feeblemind";
-                        break;
+          ///              spellId = SpellId.FeeblemindOther1;
+          ///              spellType = "Feeblemind";
+          ///              break;
                 }
             }
 
