@@ -730,7 +730,7 @@ namespace ACE.Server.WorldObjects
                     AttacksReceivedWithoutBeingAbleToCounter++;
                 }
             }
-            if (attackerAsCreate !=null)
+            if (attackerAsCreature !=null)
             {
                 attackerAsCreature.TryCastMaceDebuff (this, attackType);
 
