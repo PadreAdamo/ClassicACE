@@ -721,9 +721,8 @@ namespace ACE.Server.WorldObjects
             var attackerAsCreature = attacker as Creature;
             if (attackerAsCreature != null)
             {
-                attackerAsCreature.TryCastAssessDebuff(this, attackType);
-                attackerAsCreature.TryCastMaceDebuff(this, attackType);
-                
+                attackerAsCreature.TryCastAssessDebuff && attackerAsCreature.TryCastMaceDebuff (this, attackType);
+                                
                 if (!Guid.IsPlayer() && attacker == AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
                 {
                     if (AttacksReceivedWithoutBeingAbleToCounter == 0)
