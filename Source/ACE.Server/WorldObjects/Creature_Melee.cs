@@ -207,7 +207,7 @@ namespace ACE.Server.WorldObjects
 
                 // only pierce in front of attacker
                 var angle = GetAngle(creature);
-                if (Math.Abs(angle) > PierceAngle / 4.0f)
+                if (Math.Abs(angle) > PierceAngle / 4.5f)
                     continue;
 
                 // found cleavable object
