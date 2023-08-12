@@ -1485,8 +1485,8 @@ namespace ACE.Server.WorldObjects
             }
             else
             {
-                var spellRNGa = ThreadSafeRandom.Next(1, 6);
-                switch (spellRNGa)
+                var spellRNG = ThreadSafeRandom.Next(1, 6);
+                switch (spellRNG)
                 {
                     default:
                     case 1:
