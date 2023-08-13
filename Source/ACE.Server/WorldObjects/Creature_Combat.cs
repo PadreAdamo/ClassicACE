@@ -730,13 +730,20 @@ namespace ACE.Server.WorldObjects
                     AttacksReceivedWithoutBeingAbleToCounter++;
                 }
             }
-            else (attackerAsCreature !=null);
+        }
+        /// <summary>
+        /// Called when a creature receives an attack
+        /// </summary>
+        public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical)
+        {
+            var attackerAsCreature = attacker as Creature;
+            if (attackerAsCreature != null)
             {
                 attackerAsCreature.TryCastMaceDebuff (this, attackType);
-
-                if (!Guid.IsPlayer() && attacker = AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
+                                
+                if (!Guid.IsPlayer() && attacker == AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
                 {
-                if (AttacksReceivedWithoutBeingAbleToCounter == 0)
+                    if (AttacksReceivedWithoutBeingAbleToCounter == 0)
                         NextNoCounterResetTime = Time.GetFutureUnixTime(NoCounterInterval);
                     AttacksReceivedWithoutBeingAbleToCounter++;
                 }
