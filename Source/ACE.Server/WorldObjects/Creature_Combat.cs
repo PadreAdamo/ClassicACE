@@ -719,27 +719,12 @@ namespace ACE.Server.WorldObjects
         public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical, bool avoided)
         {
             var attackerAsCreature = attacker as Creature;
+            var debuffskill = attackerAsCreature.TryCastAssessDebuff && attackerAsCreature.TryCastMaceDebuff;
+            
             if (attackerAsCreature != null)
             {
-                attackerAsCreature.TryCastAssessDebuff (this, attackType);
-                                
-                if (!Guid.IsPlayer() && attacker == AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
-                {
-                    if (AttacksReceivedWithoutBeingAbleToCounter == 0)
-                        NextNoCounterResetTime = Time.GetFutureUnixTime(NoCounterInterval);
-                    AttacksReceivedWithoutBeingAbleToCounter++;
-                }
-            }
-        }
-        /// <summary>
-        /// Called when a creature receives an attack
-        /// </summary>
-        public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical)
-        {
-            var attackerAsCreature = attacker as Creature;
-            if (attackerAsCreature != null)
-            {
-                attackerAsCreature.TryCastMaceDebuff (this, attackType);
+//                attackerAsCreature.TryCastAssessDebuff (this, attackType);
+                    debuffskill (this, attackType);
                                 
                 if (!Guid.IsPlayer() && attacker == AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
                 {
