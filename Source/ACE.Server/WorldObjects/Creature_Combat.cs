@@ -1440,7 +1440,7 @@ namespace ACE.Server.WorldObjects
             if (NextMaceDebuffActivationTime > currentTime)
                 return;
 
-            var skill = GetCreatureSkill(Skill.Mace);
+            var skill = GetCreatureSkill(Skill.Deception);
             if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
                 return;
 
