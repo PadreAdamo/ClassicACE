@@ -719,7 +719,7 @@ namespace ACE.Server.WorldObjects
         public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical, bool avoided)
         {
             var attackerAsCreature = attacker as Creature;
-            var debuffskill = attackerAsCreature.TryCastAssessDebuff && attackerAsCreature.TryCastMaceDebuff;
+            var debuffskill = attackerAsCreature.TryCastAssessDebuff & attackerAsCreature.TryCastMaceDebuff;
             
             if (attackerAsCreature != null)
             {
