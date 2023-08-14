@@ -1414,7 +1414,7 @@ namespace ACE.Server.WorldObjects
                     { SpellId.BafflementOther1, (CombatType.Missile, "bafflement") },
                     { SpellId.FeeblemindOther1, (CombatType.Missile, "feeblemind") },
         // ... add more spells here
-               }
+               };
         
         /// <sumnmary>
         /// Mace Debuff of attributes--weakness, clumsiness, slowness, etc.
