@@ -1403,11 +1403,26 @@ namespace ACE.Server.WorldObjects
                 targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s assess knowledge exposes {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
         }
 
+        // Add a class-level counter and a dictionary to keep track of the spells for each combat type for the Axe/Mace debuffs
+        private int spellCastCounter = 0;
+        private Dictionary<SpellId, (CombatType, string)> spellIdAxeMaceDebuff = new Dictionary<SpellId, (CombatType, string)>
+                {
+                    { SpellId.WeaknessOther1, (CombatType.Melee, "weakness") },
+                    { SpellId.ClumsinessOther1, (CombatType.Melee, "clumsiness") },
+                    { SpellId.FrailtyOther1, (CombatType.Melee, "frailty") },
+                    { SpellId.SlownessOther1, (CombatType.Missile, "slowness") },
+                    { SpellId.BafflementOther1, (CombatType.Missile, "bafflement") },
+                    { SpellId.FeeblemindOther1, (CombatType.Missile, "feeblemind") },
+        // ... add more spells here
+               }
+        
         /// <sumnmary>
         /// Mace Debuff of attributes--weakness, clumsiness, slowness, etc.
         /// <summary>
         private double NextMaceDebuffActivationTime = 0;
         private static double MaceDebuffActivationInterval = 8;
+        // Maintain a flag to track whether this is our first debuff application
+        private bool isFirstApplication = true;
         public void TryCastMaceDebuff(Creature target, CombatType combatType)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
@@ -1424,10 +1439,13 @@ namespace ACE.Server.WorldObjects
             if (NextMaceDebuffActivationTime > currentTime)
                 return;
 
-            var skill = GetCreatureSkill(Skill.Axe);
-       ///          if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
-            if (skill.AdvancementClass == SkillAdvancementClass.Untrained)
+            var skillAxe = GetCreatureSkill(Skill.Axe);
+            if (skillAxe.AdvancementClass == SkillAxeAdvancementClass.Untrained || skillAxe.AdvancementClass == SkillAxeAdvancementClass.Inactive)
                 return;
+            var skillAssessCreature = GetCreatureSkill(Skill.AssessCreature);
+            if (skillAssessCreature.AdvancementClass == SkillAssessCreatureAdvancementClass.Untrained || skillAssessCreature.AdvancementClass == SkillAssessCreatureAdvancementClass.Inactive)
+                return;
+            var combinedSkill = skillAxe.Current + skillAssessCreature.Current;
 
             var sourceAsPlayer = this as Player;
             var targetAsPlayer = target as Player;
@@ -1447,77 +1465,59 @@ namespace ACE.Server.WorldObjects
             if (targetAsPlayer != null)
                 effectiveDefenseSkill *= 2;
 
-            var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, effectiveDefenseSkill);
+            var avoidChance = 1.0f - SkillCheck.GetSkillChance(combinedskill.Current, effectiveDefenseSkill);
             if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 if (sourceAsPlayer != null)
-                    sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{target.Name}'s deception stops you from exploiting a weakness; increase your Mace skill!", ChatMessageType.Magic));
+                    sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{target.Name}'s deception stops you from exploiting a weakness; increase your Axe and Mace skill!", ChatMessageType.Magic));
 
                 if (targetAsPlayer != null)
                 {
-                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, skill.Current);
+                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, combinedskill.Current);
                     targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your deception stops {Name} from finding a weakness; continue to increase your Deception skill!", ChatMessageType.Magic));
                 }
 
                 return;
             }
             else if (sourceAsPlayer != null)
-                Proficiency.OnSuccessUse(sourceAsPlayer, skill, defenseSkill.Current);
+                Proficiency.OnSuccessUse(sourceAsPlayer, combinedskill, defenseSkill.Current);
 
-            string spellType;
-            // 1/5 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
-            SpellId spellId;
-            if (ThreadSafeRandom.Next(1, 3) != 3)
+            if (isFirstApplication)
             {
-                switch (combatType)
-                {
-                    default:
-                    case CombatType.Melee:
-                        spellId = SpellId.WeaknessOther1;
-                        spellType = "melee";
-                        break;
-                    case CombatType.Missile:
-                        spellId = SpellId.SlownessOther1;
-                        spellType = "missile";
-                        break;
-                    case CombatType.Magic:
-                        spellId = SpellId.BafflementOther1;
-                        spellType = "magic";
-                        break;
-                }
-            }
-            else
+        // Select two spells based on the same combat type
+        var applicableSpells = spellIdAxeMaceDebuff
+            .Where(kv => kv.Value.Item1 == combatType)
+            .Select(kv => kv.Key)
+            .ToList();
+
+            if (applicableSpells.Count >= 2)
             {
-                var spellRNG = ThreadSafeRandom.Next(1, 3);
-                switch (spellRNG)
-                {
-                    default:
-                    case 1:
-         ///               spellId = SpellId.WeaknessOther1;
-                        spellId = SpellId.FrailtyOther1;
-                        spellType = "melee";
-                        break;                                    
-                    case 2:
-         ///               spellId = SpellId.ClumsinessOther1;
-                        spellId = SpellId.SlownessOther1;
-                        spellType = "missile";
-                        break;
-                    case 3:
-                        spellId = SpellId.BafflementOther1;
-        ///                spellId = SpellId.FeeblemindOther1;
-                        spellType = "magic";
-                        break;
-               }
+            // Choose two random spells from the applicable spells list
+            var chosenSpells = ThreadSafeRandom.PickRandom(applicableSpells, 2);
+
+            // Set spellIds based on the chosen spells
+            var spellId1 = chosenSpells[0];
+            var spellId2 = chosenSpells[1];
+          
             }
 
-            var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
-            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 5);
+        isFirstApplication = false; // Mark first application as done
+            }
+         else
+            {
+        // Choose a random spell from the spellIdCondition1 dictionary
+        var randomSpell = ThreadSafeRandom.PickRandom(spellIdAxeMaceDebuff.Keys);
+            }
+            
+                   
+            var spellLevels = SpellLevelProgression.GetSpellLevels(spellIdAxeMaceDebuff);
+            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 6);
 
             if (spellLevels.Count == 0)
                 return;
 ///base value here is skill.Current - 150) / 25.0 & skill.Current - 50) / 25.0
-            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 75) / 10.0)), maxUsableSpellLevel);
-            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 25) / 10.0), maxUsableSpellLevel));
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 180) / 30.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 80) / 30.0), maxUsableSpellLevel));
 
             int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
             var spell = new Spell(spellLevels[spellLevel]);
@@ -1540,10 +1540,10 @@ namespace ACE.Server.WorldObjects
             }
 
             if (sourceAsPlayer != null)
-                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your proficiency with Mace allows you to crack armor causing {spellTypePrefix} {spellType} vulnerability on {target.Name}!", ChatMessageType.Magic));
+                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your proficiency with Axe & Mace allows you to crack armor causing {spellTypePrefix} {spellType} vulnerability on {target.Name}!", ChatMessageType.Magic));
             if (targetAsPlayer != null)
-                targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s Mace skill cracks your armor causing {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
-      }
+                targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s Axe & Mace skill cracks your armor causing {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
+    }
             
         /// <summary>
         /// Returns TRUE if the creature receives a +5 DR bonus for this weapon type
