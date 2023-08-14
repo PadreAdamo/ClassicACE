@@ -1499,11 +1499,11 @@ namespace ACE.Server.WorldObjects
                         break;                                    
                     case 2:
                         spellId = SpellId.ClumsinessOther1;
-                        spellId = SpellId.SlownessOTher1;
+                        spellId = SpellId.SlownessOther1;
                         spellType = "missile";
                         break;
                     case 3:
-                        spellId = SpellId.BattlementOther1;
+                        spellId = SpellId.BafflementOther1;
                         spellId = SpellId.FeeblemindOther1;
                         spellType = "magic";
                         break;
