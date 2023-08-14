@@ -1426,7 +1426,7 @@ namespace ACE.Server.WorldObjects
                 return;
 
             var skill = GetCreatureSkill(Skill.Axe);
-            if (skillAxe.AdvancementClass == SkillAdvancementClass.Untrained || skillAxe.AdvancementClass == SkillAdvancementClass.Inactive)
+            if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
                 return;
             
             var sourceAsPlayer = this as Player;
@@ -1447,7 +1447,7 @@ namespace ACE.Server.WorldObjects
             if (targetAsPlayer != null)
                 effectiveDefenseSkill *= 2;
 
-            var avoidChance = 1.0f - SkillCheck.GetSkillChance(Skill.Current, effectiveDefenseSkill);
+            var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, effectiveDefenseSkill);
             if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 if (sourceAsPlayer != null)
@@ -1455,7 +1455,7 @@ namespace ACE.Server.WorldObjects
 
                 if (targetAsPlayer != null)
                 {
-                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, Skill.Current);
+                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, kill.Current);
                     targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your deception stops {Name} from finding a weakness; continue to increase your Deception skill!", ChatMessageType.Magic));
                 }
 
@@ -1522,8 +1522,8 @@ namespace ACE.Server.WorldObjects
             if (spellLevels.Count == 0)
                 return;
 
-            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)Skill.Current - 135) / 50.0)), maxUsableSpellLevel);
-            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)Skill.Current - 35) / 50.0), maxUsableSpellLevel));
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 135) / 50.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 35) / 50.0), maxUsableSpellLevel));
 
             int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
             var spell = new Spell(spellLevels[spellLevel]);
