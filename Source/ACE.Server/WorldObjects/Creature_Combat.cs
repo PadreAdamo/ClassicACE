@@ -1408,7 +1408,7 @@ namespace ACE.Server.WorldObjects
         /// Mace Debuff of attributes--weakness, clumsiness, slowness, etc.
         /// <summary>
         private double NextMaceDebuffActivationTime = 0;
-        private static double MaceDebuffActivationInterval = 8;
+        private static double MaceDebuffActivationInterval = 5;
         public void TryCastMaceDebuff(Creature target, CombatType combatType)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
@@ -1461,62 +1461,39 @@ namespace ACE.Server.WorldObjects
 
                 return;
             }
-            string spellType;
-            // 1/5 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
-            SpellId spellId;
-            if (ThreadSafeRandom.Next(1, 4) != 4)
-            {
-                switch (combatType)
-                {
-                    default:
-                    case CombatType.Melee:
-                        spellId = SpellId.WeaknessOther1;
-                        spellType = "weakness";
-                        break;
-                    case CombatType.Missile:
-                        spellId = SpellId.ClumsinessOther1;
-                        spellType = "clumsiness";
-                        break;
-                    case CombatType.Magic:
-                        spellId = SpellId.FeeblemindOther1;
-                        spellType = "feeblemind";
-                        break;
-                }
-            }
-            else
-            {
-                var spellRNG = ThreadSafeRandom.Next(1, 7);
-                switch (spellRNG)
-                {
-                    default:
-                    case 1:
-                        spellId = SpellId.WeaknessOther1;
-                        spellType = "weakness";
-                        break;
-                    case 2:
-                        spellId = SpellId.ClumsinessOther1;
-                        spellType = "clumsiness";
-                        break;
-                    case 3:
-                        spellId = SpellId.FeeblemindOther1;
-                        spellType = "feeblemind";
-                        break;
-                    case 4:
-                        spellId = SpellId.FrailtyOther1;
-                        spellType = "frailty";
-                        break;
-                    case 5:
-                        spellId = SpellId.SlownessOther1;
-                        spellType = "slowness";
-                        break;
-                    case 6:
-                        spellId = SpellId.BafflementOther1;
-                        spellType = "bafflement";
-                        break;
-                }
-            }
+        string spellType;
+        SpellId spellId;
+        int randomSpell = ThreadSafeRandom.Next(1, 7);
 
-            var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
+        switch (randomSpell)
+            {
+            default:
+            case 1:
+                spellId = SpellId.WeaknessOther1;
+                spellType = "weakness";
+            break;
+            case 2:
+                spellId = SpellId.ClumsinessOther1;
+                spellType = "clumsiness";
+            break;
+            case 3:
+                spellId = SpellId.FeeblemindOther1;
+                spellType = "feeblemind";
+            break;
+            case 4:
+                spellId = SpellId.FrailtyOther1;
+                spellType = "frailty";
+            break;
+            case 5:
+                spellId = SpellId.SlownessOther1;
+                spellType = "slowness";
+            break;
+            case 6:
+                spellId = SpellId.BafflementOther1;
+                spellType = "bafflement";
+                break;
+            }
+           var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
             int maxUsableSpellLevel = Math.Min(spellLevels.Count, 5);
 
             if (spellLevels.Count == 0)
