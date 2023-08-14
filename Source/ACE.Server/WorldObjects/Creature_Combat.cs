@@ -1426,7 +1426,7 @@ namespace ACE.Server.WorldObjects
                 return;
 
             var skill = GetCreatureSkill(Skill.Axe);
-            if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
+            if (skill.AdvancementClass == SkillAdvancementClass.Trained || skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
                 return;
             
             var sourceAsPlayer = this as Player;
