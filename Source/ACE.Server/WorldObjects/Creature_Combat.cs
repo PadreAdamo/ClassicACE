@@ -1431,7 +1431,7 @@ namespace ACE.Server.WorldObjects
             var skillAssessCreature = GetCreatureSkill(Skill.AssessCreature);
             if (skillAssessCreature.AdvancementClass == SkillAdvancementClass.Untrained || skillAssessCreature.AdvancementClass == SkillAdvancementClass.Inactive)
                 return;
-            var combinedSkill = skillAxe.Current + skillAssessCreature.Current;
+            var combinedSkill = skillAxe.CurrentLevel + skillAssessCreature.CurrentLevel;
 
             var sourceAsPlayer = this as Player;
             var targetAsPlayer = target as Player;
