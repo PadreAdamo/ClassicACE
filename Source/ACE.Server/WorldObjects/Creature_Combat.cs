@@ -1425,7 +1425,7 @@ namespace ACE.Server.WorldObjects
             if (NextMaceDebuffActivationTime > currentTime)
                 return;
 
-            var skillAxe = GetCreatureSkill(Skill.Axe);
+            var skill = GetCreatureSkill(Skill.Axe);
             if (skillAxe.AdvancementClass == SkillAdvancementClass.Untrained || skillAxe.AdvancementClass == SkillAdvancementClass.Inactive)
                 return;
             
@@ -1522,8 +1522,8 @@ namespace ACE.Server.WorldObjects
             if (spellLevels.Count == 0)
                 return;
 
-            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)combinedSkill.Current - 135) / 50.0)), maxUsableSpellLevel);
-            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)combinedSkill.Current - 35) / 50.0), maxUsableSpellLevel));
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)Skill.Current - 135) / 50.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)Skill.Current - 35) / 50.0), maxUsableSpellLevel));
 
             int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
             var spell = new Spell(spellLevels[spellLevel]);
