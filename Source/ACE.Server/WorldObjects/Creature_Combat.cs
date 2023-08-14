@@ -1424,8 +1424,8 @@ namespace ACE.Server.WorldObjects
             if (NextMaceDebuffActivationTime > currentTime)
                 return;
 
-            var skill = GetCreatureSkill(Skill.Mace);
-  ///          if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
+            var skill = GetCreatureSkill(Skill.Axe);
+       ///          if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
             if (skill.AdvancementClass == SkillAdvancementClass.Untrained)
                 return;
 
@@ -1493,18 +1493,18 @@ namespace ACE.Server.WorldObjects
                 {
                     default:
                     case 1:
-                        spellId = SpellId.WeaknessOther1;
+         ///               spellId = SpellId.WeaknessOther1;
                         spellId = SpellId.FrailtyOther1;
                         spellType = "melee";
                         break;                                    
                     case 2:
-                        spellId = SpellId.ClumsinessOther1;
+         ///               spellId = SpellId.ClumsinessOther1;
                         spellId = SpellId.SlownessOther1;
                         spellType = "missile";
                         break;
                     case 3:
                         spellId = SpellId.BafflementOther1;
-                        spellId = SpellId.FeeblemindOther1;
+        ///                spellId = SpellId.FeeblemindOther1;
                         spellType = "magic";
                         break;
                }
