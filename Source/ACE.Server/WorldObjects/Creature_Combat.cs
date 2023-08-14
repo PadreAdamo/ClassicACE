@@ -1455,7 +1455,7 @@ namespace ACE.Server.WorldObjects
 
                 if (targetAsPlayer != null)
                 {
-                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, kill.Current);
+                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, skill.Current);
                     targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your deception stops {Name} from finding a weakness; continue to increase your Deception skill!", ChatMessageType.Magic));
                 }
 
