@@ -1428,11 +1428,7 @@ namespace ACE.Server.WorldObjects
             var skillAxe = GetCreatureSkill(Skill.Axe);
             if (skillAxe.AdvancementClass == SkillAdvancementClass.Untrained || skillAxe.AdvancementClass == SkillAdvancementClass.Inactive)
                 return;
-            var skillAssessCreature = GetCreatureSkill(Skill.AssessCreature);
-            if (skillAssessCreature.AdvancementClass == SkillAdvancementClass.Untrained || skillAssessCreature.AdvancementClass == SkillAdvancementClass.Inactive)
-                return;
-            var combinedSkill = skillAxe.CurrentLevel + skillAssessCreature.CurrentLevel;
-
+            
             var sourceAsPlayer = this as Player;
             var targetAsPlayer = target as Player;
 
@@ -1451,7 +1447,7 @@ namespace ACE.Server.WorldObjects
             if (targetAsPlayer != null)
                 effectiveDefenseSkill *= 2;
 
-            var avoidChance = 1.0f - SkillCheck.GetSkillChance(combinedSkill.Current, effectiveDefenseSkill);
+            var avoidChance = 1.0f - SkillCheck.GetSkillChance(Skill.Current, effectiveDefenseSkill);
             if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 if (sourceAsPlayer != null)
@@ -1459,7 +1455,7 @@ namespace ACE.Server.WorldObjects
 
                 if (targetAsPlayer != null)
                 {
-                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, combinedSkill.Current);
+                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, Skill.Current);
                     targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your deception stops {Name} from finding a weakness; continue to increase your Deception skill!", ChatMessageType.Magic));
                 }
 
@@ -1468,7 +1464,7 @@ namespace ACE.Server.WorldObjects
             string spellType;
             // 1/5 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
             SpellId spellId;
-            if (ThreadSafeRandom.Next(1, 5) != 5)
+            if (ThreadSafeRandom.Next(1, 4) != 4)
             {
                 switch (combatType)
                 {
@@ -1489,7 +1485,7 @@ namespace ACE.Server.WorldObjects
             }
             else
             {
-                var spellRNG = ThreadSafeRandom.Next(1, 3);
+                var spellRNG = ThreadSafeRandom.Next(1, 7);
                 switch (spellRNG)
                 {
                     default:
@@ -1526,8 +1522,8 @@ namespace ACE.Server.WorldObjects
             if (spellLevels.Count == 0)
                 return;
 
-            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)combinedSkill.Current - 250) / 50.0)), maxUsableSpellLevel);
-            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)combinedSkill.Current - 100) / 50.0), maxUsableSpellLevel));
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)combinedSkill.Current - 135) / 50.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)combinedSkill.Current - 35) / 50.0), maxUsableSpellLevel));
 
             int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
             var spell = new Spell(spellLevels[spellLevel]);
