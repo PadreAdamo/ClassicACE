@@ -1493,7 +1493,8 @@ namespace ACE.Server.WorldObjects
                 spellType = "bafflement";
                 break;
             }
-           var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
+           
+            var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
             int maxUsableSpellLevel = Math.Min(spellLevels.Count, 5);
 
             if (spellLevels.Count == 0)
@@ -1523,9 +1524,9 @@ namespace ACE.Server.WorldObjects
             }
 
             if (sourceAsPlayer != null)
-                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your proficiency with Assess, Axe & Mace skills allows you to crack armor causing {spellTypePrefix} {spellType} vulnerability on {target.Name}!", ChatMessageType.Magic));
+                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your proficiency Axe & Mace skills allows you to crack armor causing {spellTypePrefix} {spellType} vulnerability on {target.Name}!", ChatMessageType.Magic));
             if (targetAsPlayer != null)
-                targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s Assess, Axe & Mace skills cracks your armor causing {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
+                targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s Axe & Mace skills cracks your armor causing {spellTypePrefix} {spellType} vulnerability!", ChatMessageType.Magic));
     }
             
         /// <summary>
