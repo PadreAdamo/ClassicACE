@@ -1445,7 +1445,7 @@ namespace ACE.Server.WorldObjects
             var effectiveDefenseSkill = defenseSkill.Current;
 
             if (targetAsPlayer != null)
-                effectiveDefenseSkill *= 2;
+                effectiveDefenseSkill *= 3;
 
             var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, effectiveDefenseSkill);
             if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
@@ -1500,8 +1500,8 @@ namespace ACE.Server.WorldObjects
             if (spellLevels.Count == 0)
                 return;
 
-            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 135) / 50.0)), maxUsableSpellLevel);
-            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 35) / 50.0), maxUsableSpellLevel));
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 175) / 50.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 75) / 50.0), maxUsableSpellLevel));
 
             int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
             var spell = new Spell(spellLevels[spellLevel]);
