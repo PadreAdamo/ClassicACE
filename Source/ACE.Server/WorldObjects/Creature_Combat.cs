@@ -1465,7 +1465,25 @@ namespace ACE.Server.WorldObjects
         string spellType;
         SpellId spellId;
         int randomSpell = ThreadSafeRandom.Next(1, 7);
-
+		
+		var weakness = new Spell(SpellId.WeaknessOther1);
+		weakness.Duration = 25;
+		
+		var clumsiness = new Spell(SpellId.ClumsinessOther1);
+		clumsiness.Duration = 25;
+		
+		var feeblemind = new Spell(SpellId.FeeblemindOther1);
+		feeblemind.Duration = 25;
+		
+		var slowness = new Spell(SpellId.SlownessOther1);
+		slowness.Duration = 25;
+		
+		var frailty = new Spell(SpellId.FrailtyOther1);
+		frailty.Duration = 25;
+		
+		var bafflement = new Spell(SpellId.BafflementOther1);
+		bafflement.Duration = 25;
+	
         switch (randomSpell)
             {
             default:
