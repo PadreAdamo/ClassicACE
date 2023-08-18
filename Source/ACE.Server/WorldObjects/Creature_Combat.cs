@@ -724,6 +724,7 @@ namespace ACE.Server.WorldObjects
             {
                attackerAsCreature.TryCastAssessDebuff (this, attackType);
                attackerAsCreature.TryCastMaceDebuff (this, attackType);
+                attackerAsCreature.TryCastDefenseBuff (this, attackType);
                                 
                 if (!Guid.IsPlayer() && attacker == AttackTarget && (attackType == CombatType.Missile || attackType == CombatType.Magic))
                 {
@@ -1528,6 +1529,140 @@ namespace ACE.Server.WorldObjects
             if (targetAsPlayer != null)
                 targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s Axe & Mace skill cracks your armor causing {spellTypePrefix} {spellType} vulnerability!", ChatMessageType.Magic));
     }
+
+        		/// Summary: A little buff to folks with with any of the defenses specialized.
+		private double NextDefenseBuffActivationTime = 0;
+        private static double DefenseBuffActivationInterval = 30;
+        public void TryCastDefenseBuff(Creature target, CombatType combatType)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return;
+
+            /// if (this == target)
+            /// return; // We don't want to find vulnerabilities on ourselves!
+
+            if (target.IsDead)
+                return; // Target is already dead, abort!
+
+            var currentTime = Time.GetUnixTime();
+
+            if (NextDefenseBuffActivationTime > currentTime)
+                return;
+
+            var meleedefenseskill = GetCreatureSkill(Skill.MeleeDefense);
+			var missiledefenseskill = GetCreatureSkill(Skill.MissileDefense);
+			var magicdefenseskill = GetCreatureSkill(Skill.MagicDefense);
+			
+			if (meleedefenseskill.AdvancementClass < SkillAdvancementClass.Specialized || missiledefenseskill.AdvancementClass < SkillAdvancementClass.Specialized || magicdefenseskill.AdvancementClass < SkillAdvancementClass.Specialized)
+                return;
+
+            var sourceAsPlayer = this as Player;
+            var targetAsPlayer = target as Player;
+
+            var activationChance = 0.25f;
+
+            if (activationChance < ThreadSafeRandom.Next(0.0f, 1.0f))
+                return;
+
+            NextDefenseBuffActivationTime = currentTime + DefenseBuffActivationInterval;
+
+            var cancelSkill = target.GetCreatureSkill(Skill.Deception);
+            var effectiveDefenseSkill = cancelSkill.Current;
+
+            if (targetAsPlayer != null)
+                effectiveDefenseSkill *= 3;
+
+			var defenseSkillToUse = meleedefenseskill;  // default value
+			switch (combatType)
+			{
+				case CombatType.Melee:
+					defenseSkillToUse = meleedefenseskill;
+				break;
+    
+				case CombatType.Missile:
+					defenseSkillToUse = missiledefenseskill;
+				break;
+    
+				case CombatType.Magic:
+					defenseSkillToUse = magicdefenseskill;
+				break;
+    
+			default:
+				throw new InvalidOperationException("Unknown combat type.");
+			}
+
+			var avoidChance = 1.0f - SkillCheck.GetSkillChance(defenseSkillToUse.Current, effectiveDefenseSkill);
+			if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
+			{
+				if (sourceAsPlayer != null)
+					sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{target.Name}'s Assess Skill stops you from improving your defenses!", ChatMessageType.Magic));
+			
+				if (targetAsPlayer != null)
+				{
+					Proficiency.OnSuccessUse(targetAsPlayer, cancelSkill, defenseSkillToUse.Current);
+					targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your Assess stops {Name} from finding a way to improve their defenses!", ChatMessageType.Magic));
+				}
+
+			return;
+			
+            }
+            
+			else if (sourceAsPlayer != null)
+                Proficiency.OnSuccessUse(sourceAsPlayer, defenseSkillToUse, cancelSkill.Current);
+
+            string spellType = "none";
+            SpellId spellId = default;
+            
+			if (meleedefenseskill.AdvancementClass == SkillAdvancementClass.Specialized && combatType == CombatType.Melee) 
+				{
+					spellId = SpellId.InvulnerabilitySelf1;
+					spellType = "melee";
+				} 
+			else if (missiledefenseskill.AdvancementClass == SkillAdvancementClass.Specialized && combatType == CombatType.Missile)
+				{
+					spellId = SpellId.ImpregnabilitySelf1;
+					spellType = "missile";
+				} 
+			else if (magicdefenseskill.AdvancementClass == SkillAdvancementClass.Specialized && combatType == CombatType.Magic) 
+				{
+					spellId = SpellId.MagicResistanceSelf1;
+					spellType = "magic";
+				}
+			
+			var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
+            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 6);
+
+            if (spellLevels.Count == 0)
+                return;
+
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)defenseSkillToUse.Current - 250) / 50.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)defenseSkillToUse.Current - 150) / 50.0), maxUsableSpellLevel));
+
+            int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
+            var spell = new Spell(spellLevels[spellLevel]);
+
+            if (spell.NonComponentTargetType == ItemType.None)
+                TryCastSpell(spell, null, this, null, false, false, false, false);
+            else
+                TryCastSpell(spell, target, this, null, false, false, false, false);
+
+            string spellTypePrefix;
+            switch (spellLevel + 1)
+            {
+                case 1: spellTypePrefix = "a minor"; break;
+                default:
+                case 2: spellTypePrefix = "a"; break;
+                case 3: spellTypePrefix = "a moderate"; break;
+                case 4: spellTypePrefix = "a temperate"; break;
+                case 5: spellTypePrefix = "a major"; break;
+                case 6: spellTypePrefix = "a fortunate"; break;
+            }
+
+            if (sourceAsPlayer != null)
+                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your quick wit allows you to improve your defenses with {spellTypePrefix} {spellType} boon on {target.Name}!", ChatMessageType.Magic));
+            if (targetAsPlayer != null)
+                targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s quick wit allows {spellTypePrefix} {spellType} boon on themselves!", ChatMessageType.Magic));
+			}
             
         /// <summary>
         /// Returns TRUE if the creature receives a +5 DR bonus for this weapon type
