@@ -1465,62 +1465,50 @@ namespace ACE.Server.WorldObjects
         string spellType;
         SpellId spellId;
         int randomSpell = ThreadSafeRandom.Next(1, 7);
-		
-		var weakness = new Spell(SpellId.WeaknessOther1);
-		weakness.Duration = 25;
-		
-		var clumsiness = new Spell(SpellId.ClumsinessOther1);
-		clumsiness.Duration = 25;
-		
-		var feeblemind = new Spell(SpellId.FeeblemindOther1);
-		feeblemind.Duration = 25;
-		
-		var slowness = new Spell(SpellId.SlownessOther1);
-		slowness.Duration = 25;
-		
-		var frailty = new Spell(SpellId.FrailtyOther1);
-		frailty.Duration = 25;
-		
-		var bafflement = new Spell(SpellId.BafflementOther1);
-		bafflement.Duration = 25;
-	
+			
         switch (randomSpell)
             {
             default:
             case 1:
-                spellId = SpellId.WeaknessOther1;
+                var weakness = new Spell(SpellId.WeaknessOther1);
+		        weakness.Duration = 15;
                 spellType = "weakness";
             break;
             case 2:
-                spellId = SpellId.ClumsinessOther1;
+                var clumsiness = new Spell(SpellId.ClumsinessOther1);
+		        clumsiness.Duration = 15;
                 spellType = "clumsiness";
             break;
             case 3:
-                spellId = SpellId.FeeblemindOther1;
+                var feeblemind = new Spell(SpellId.FeeblemindOther1);
+		        feeblemind.Duration = 15;
                 spellType = "feeblemind";
             break;
             case 4:
-                spellId = SpellId.FrailtyOther1;
+		        var frailty = new Spell(SpellId.FrailtyOther1);
+		        frailty.Duration = 20;
                 spellType = "frailty";
             break;
             case 5:
-                spellId = SpellId.SlownessOther1;
+		        var slowness = new Spell(SpellId.SlownessOther1);
+		        slowness.Duration = 15;
                 spellType = "slowness";
             break;
             case 6:
-                spellId = SpellId.BafflementOther1;
+		        var bafflement = new Spell(SpellId.BafflementOther1);
+		        bafflement.Duration = 15;
                 spellType = "bafflement";
                 break;
             }
            
             var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
-            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 5);
+            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 6);
 
             if (spellLevels.Count == 0)
                 return;
 
-            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 175) / 50.0)), maxUsableSpellLevel);
-            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 75) / 50.0), maxUsableSpellLevel));
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 200) / 50.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 125) / 50.0), maxUsableSpellLevel));
 
             int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
             var spell = new Spell(spellLevels[spellLevel]);
@@ -1677,7 +1665,7 @@ namespace ACE.Server.WorldObjects
             }
 
             if (sourceAsPlayer != null)
-                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your quick wit allows you to improve your defenses with {spellTypePrefix} {spellType} boon on {target.Name}!", ChatMessageType.Magic));
+                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your quick wit allows you to improve your defenses with {spellTypePrefix} {spellType} boon!", ChatMessageType.Magic));
             if (targetAsPlayer != null)
                 targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s quick wit allows {spellTypePrefix} {spellType} boon on themselves!", ChatMessageType.Magic));
 			}
