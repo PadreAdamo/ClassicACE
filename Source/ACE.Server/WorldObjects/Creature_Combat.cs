@@ -1470,32 +1470,38 @@ namespace ACE.Server.WorldObjects
             {
             default:
             case 1:
+                spellId = SpellId.WeaknessOther1;
                 var weakness = new Spell(SpellId.WeaknessOther1);
 		        weakness.Duration = 15;
                 spellType = "weakness";
             break;
             case 2:
+                spellId = SpellId.ClumsinessOther1;
                 var clumsiness = new Spell(SpellId.ClumsinessOther1);
 		        clumsiness.Duration = 15;
                 spellType = "clumsiness";
             break;
             case 3:
+                spellId = SpellId.FeeblemindOther1;
                 var feeblemind = new Spell(SpellId.FeeblemindOther1);
 		        feeblemind.Duration = 15;
                 spellType = "feeblemind";
             break;
             case 4:
-		        var frailty = new Spell(SpellId.FrailtyOther1);
+		        spellId = SpellId.FrailtyOther1;
+                var frailty = new Spell(SpellId.FrailtyOther1);
 		        frailty.Duration = 20;
                 spellType = "frailty";
             break;
             case 5:
-		        var slowness = new Spell(SpellId.SlownessOther1);
+		        spellId = SpellId.SlownessOther1;
+                var slowness = new Spell(SpellId.SlownessOther1);
 		        slowness.Duration = 15;
                 spellType = "slowness";
             break;
             case 6:
-		        var bafflement = new Spell(SpellId.BafflementOther1);
+		        spellId = SpellId.BafflementOther1;
+                var bafflement = new Spell(SpellId.BafflementOther1);
 		        bafflement.Duration = 15;
                 spellType = "bafflement";
                 break;
@@ -1582,7 +1588,7 @@ namespace ACE.Server.WorldObjects
 			switch (combatType)
 			{
 				case CombatType.Melee:
-					defenseSkillToUse = meleedefenseskill;
+                    defenseSkillToUse = meleedefenseskill;
 				break;
     
 				case CombatType.Missile:
