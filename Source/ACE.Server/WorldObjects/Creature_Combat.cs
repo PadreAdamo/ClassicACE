@@ -1408,7 +1408,7 @@ namespace ACE.Server.WorldObjects
         /// <sumnmary>
         /// Mace Debuff of attributes--weakness, clumsiness, slowness, etc.
         /// <summary>
-        private double NextMaceDebuffActivationTime = 0;
+		private double NextMaceDebuffActivationTime = 0;
         private static double MaceDebuffActivationInterval = 5;
         public void TryCastMaceDebuff(Creature target, CombatType combatType)
         {
@@ -1427,7 +1427,7 @@ namespace ACE.Server.WorldObjects
                 return;
 
             var skill = GetCreatureSkill(Skill.Axe);
-            if (skill.AdvancementClass < SkillAdvancementClass.Specialized)
+		    if (skill.AdvancementClass < SkillAdvancementClass.Specialized)
                 return;
             
             var sourceAsPlayer = this as Player;
@@ -1462,67 +1462,26 @@ namespace ACE.Server.WorldObjects
 
                 return;
             }
-        string spellType;
-        SpellId spellId;
-        int randomSpell = ThreadSafeRandom.Next(1, 7);
-			
-        switch (randomSpell)
-            {
-            default:
-            case 1:
-                spellId = SpellId.WeaknessOther1;
-                var weakness = new Spell(SpellId.WeaknessOther1);
-		        weakness.Duration = 15;
-                spellType = "weakness";
-            break;
-            case 2:
-                spellId = SpellId.ClumsinessOther1;
-                var clumsiness = new Spell(SpellId.ClumsinessOther1);
-		        clumsiness.Duration = 15;
-                spellType = "clumsiness";
-            break;
-            case 3:
-                spellId = SpellId.FeeblemindOther1;
-                var feeblemind = new Spell(SpellId.FeeblemindOther1);
-		        feeblemind.Duration = 15;
-                spellType = "feeblemind";
-            break;
-            case 4:
-		        spellId = SpellId.FrailtyOther1;
-                var frailty = new Spell(SpellId.FrailtyOther1);
-		        frailty.Duration = 20;
-                spellType = "frailty";
-            break;
-            case 5:
-		        spellId = SpellId.SlownessOther1;
-                var slowness = new Spell(SpellId.SlownessOther1);
-		        slowness.Duration = 15;
-                spellType = "slowness";
-            break;
-            case 6:
-		        spellId = SpellId.BafflementOther1;
-                var bafflement = new Spell(SpellId.BafflementOther1);
-		        bafflement.Duration = 15;
-                spellType = "bafflement";
-                break;
-            }
-           
-            var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
-            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 6);
+        
+        // Fetch both the spell and its type
+		(Spell randomDebuffSpell, string spellType) = GetRandomMaceDebuffSpell();
+
+		// Use the spell's Id
+		var spellLevels = SpellLevelProgression.GetSpellLevels((ACE.Entity.Enum.SpellId)randomDebuffSpell.Id);
+        
+		int maxUsableSpellLevel = Math.Min(spellLevels.Count, 5);
 
             if (spellLevels.Count == 0)
                 return;
 
-            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 200) / 50.0)), maxUsableSpellLevel);
-            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 125) / 50.0), maxUsableSpellLevel));
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 225) / 50.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 115) / 50.0), maxUsableSpellLevel));
 
             int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
             var spell = new Spell(spellLevels[spellLevel]);
 
-            if (spell.NonComponentTargetType == ItemType.None)
-                TryCastSpell(spell, null, this, null, false, false, false, false);
-            else
-                TryCastSpell(spell, target, this, null, false, false, false, false);
+			if (spell.NonComponentTargetType == ItemType.None)
+				SpellProjectile.TryCastSpell(spell, target, fromTryCastMaceDebuff: true);
 
             string spellTypePrefix;
             switch (spellLevel + 1)
@@ -1541,7 +1500,28 @@ namespace ACE.Server.WorldObjects
             if (targetAsPlayer != null)
                 targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s Axe & Mace skill cracks your armor causing {spellTypePrefix} {spellType} vulnerability!", ChatMessageType.Magic));
     }
-
+	
+	private (Spell, string) GetRandomMaceDebuffSpell()
+{
+    int randomValue = ThreadSafeRandom.Next(1, 7);
+    switch (randomValue)
+    {
+        case 1:
+            return (new Spell(SpellId.WeaknessOther1), "weakness");
+        case 2:
+            return (new Spell(SpellId.ClumsinessOther1), "clumsiness");
+        case 3:
+            return (new Spell(SpellId.FeeblemindOther1), "feeblemind");
+        case 4:
+            return (new Spell(SpellId.FrailtyOther1), "frailty");
+        case 5:
+            return (new Spell(SpellId.SlownessOther1), "slowness");
+        case 6:
+            return (new Spell(SpellId.BafflementOther1), "bafflement");
+        default:
+            return (new Spell(SpellId.WeaknessOther1), "weakness");
+    }
+} 
         		/// Summary: A little buff to folks with with any of the defenses specialized.
 		private double NextDefenseBuffActivationTime = 0;
         private static double DefenseBuffActivationInterval = 30;
