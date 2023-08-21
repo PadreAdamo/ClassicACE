@@ -1267,5 +1267,31 @@ namespace ACE.Server.WorldObjects
 
             observer.DebugDamageBuffer = null;
         }
+	
+    public static void TryCastSpell(Spell spell, Creature target, bool fromTryCastMaceDebuff = false)
+		{
+			if (fromTryCastMaceDebuff)
+			{
+				AdjustMaceDebuffSpellDuration(spell);
+			}
+		}
+ 
+	private static void AdjustMaceDebuffSpellDuration(Spell spell)
+		{
+			const int adjustedDuration = 15; // Adjust this value if the duration ever changes in the future
+    
+		    switch ((uint)spell.Id)
+			{
+			case (uint)SpellId.WeaknessOther1:
+			case (uint)SpellId.ClumsinessOther1:
+			case (uint)SpellId.FrailtyOther1:
+			case (uint)SpellId.SlownessOther1:
+			case (uint)SpellId.FeeblemindOther1:
+			case (uint)SpellId.BafflementOther1:
+            spell.Duration = adjustedDuration;
+            break;
+			}
+		}
+		       
     }
 }
