@@ -371,21 +371,31 @@ namespace ACE.Server.Entity
                 {
                     IsCritical = true;
 
-                    // verify: CriticalMultiplier only applied to the additional crit damage,
-                    // whereas CD/CDR applied to the total damage (base damage + additional crit damage)
-                    CriticalDamageMod = 1.0f + WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender, pkBattle);
+                    // Verify: CriticalMultiplier is only applied to the additional crit damage,
+                    // whereas CD/CDR is applied to the total damage (base damage + additional crit damage)
+                    // Axes and Crossbows have an additional critical damage bonus that scales with Power Bar by 0.10f
+
+                    if (Weapon != null && Weapon.WeaponSkill == Skill.Axe)
+                    {
+                        // Calculate the CriticalDamageMod when the weapon skill is Axe
+                        CriticalDamageMod = 1.5f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f) + WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender, pkBattle);
+                    }
+                    else if (Weapon != null && Weapon.WeaponSkill == Skill.Crossbow)
+                    {
+                        // Calculate the CriticalDamageMod when the weapon is a Crossbow
+                        CriticalDamageMod = 1.3f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f) + WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender, pkBattle);
+                    }
+                    else
+                    {
+                       // Calculate the CriticalDamageMod for other cases
+                        CriticalDamageMod = 1.0f + WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender, pkBattle);
+                    }
         
                     CriticalDamageRatingMod = Creature.GetPositiveRatingMod(attacker.GetCritDamageRating());
                 
                     // recklessness excluded from crits
                     RecklessnessMod = 1.0f;
                     DamageRatingMod = Creature.AdditiveCombine(DamageRatingBaseMod, CriticalDamageRatingMod, SneakAttackMod, HeritageMod, extraDamageMod);
-
-                    // Axes have an additional critical damage bonus that scales with Power Bar by .10f
-				    if (Weapon != null && Weapon.WeaponSkill == Skill.Axe)
-                    {
-                        CriticalDamageMod = 1.5f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f) + WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender, pkBattle);
-                    }
                     
                     if (pkBattle)
                         DamageRatingMod = Creature.AdditiveCombine(DamageRatingMod, PkDamageMod);
