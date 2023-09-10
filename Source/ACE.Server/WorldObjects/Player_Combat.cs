@@ -640,7 +640,12 @@ namespace ACE.Server.WorldObjects
                 Die();
                 return (int)damageTaken;
             }
-
+            
+            if (damageTaken > 0)
+            {
+                ApplySpellOnSpecializedArmor(this, damageType, bodyPart);
+            }
+                        
             if (!BodyParts.Indices.TryGetValue(bodyPart, out var iDamageLocation))
             {
                 log.Error($"{Name}.TakeDamage({source.Name}, {damageType}, {amount}, {bodyPart}, {crit}): avoided crash for bad damage location");
@@ -706,6 +711,94 @@ namespace ACE.Server.WorldObjects
             return null;
         }
 
+        private Dictionary<DamageType, string> _damageTypeToSpellMapping = new Dictionary<DamageType, string>
+        {
+            { DamageType.Slash, "CANTRIPSLASHINGBANE1" },
+            { DamageType.Pierce, "CANTRIPPIERCINGBANE1" },
+            { DamageType.Bludgeon, "CANTRIPBLUDGEONINGBANE1" },
+            { DamageType.Fire, "CANTRIPFLAMEBANE1" },
+            { DamageType.Cold, "CANTRIPFROSTBANE1" },
+            { DamageType.Acid, "CANTRIPACIDBANE1" },
+            { DamageType.Electric, "CANTRIPSTORMBANE1" },
+        };
+
+        private Dictionary<string, SpellId> _spellNameToIdMapping = new Dictionary<string, SpellId>
+        {
+            { "CANTRIPSLASHINGBANE1", SpellId.CANTRIPSLASHINGBANE1 },
+		    { "CANTRIPSLASHINGBANE2", SpellId.CANTRIPSLASHINGBANE2 },
+		    { "CANTRIPSLASHINGBANE3", SpellId.CANTRIPSLASHINGBANE3 },
+            { "CANTRIPPIERCINGBANE1", SpellId.CANTRIPPIERCINGBANE1 },
+		    { "CANTRIPPIERCINGBANE2", SpellId.CANTRIPPIERCINGBANE2 },
+		    { "CANTRIPPIERCINGBANE3", SpellId.CANTRIPPIERCINGBANE3 },
+		    { "CANTRIPBLUDGEONINGBANE1", SpellId.CANTRIPBLUDGEONINGBANE1 },
+		    { "CANTRIPBLUDGEONINGBANE2", SpellId.CANTRIPBLUDGEONINGBANE2 },
+		    { "CANTRIPBLUDGEONINGBANE3", SpellId.CANTRIPBLUDGEONINGBANE3 },
+            { "CANTRIPFLAMEBANE1", SpellId.CANTRIPFLAMEBANE1 },
+		    { "CANTRIPFLAMEBANE2", SpellId.CANTRIPFLAMEBANE2 },
+		    { "CANTRIPFLAMEBANE3", SpellId.CANTRIPFLAMEBANE3 },
+            { "CANTRIPFROSTBANE1", SpellId.CANTRIPFROSTBANE1 },
+		    { "CANTRIPFROSTBANE2", SpellId.CANTRIPFROSTBANE2 },
+		    { "CANTRIPFROSTBANE3", SpellId.CANTRIPFROSTBANE3 },
+            { "CANTRIPACIDBANE1", SpellId.CANTRIPACIDBANE1 },
+		    { "CANTRIPACIDBANE2", SpellId.CANTRIPACIDBANE2 },
+		    { "CANTRIPACIDBANE3", SpellId.CANTRIPACIDBANE3 },
+	        { "CANTRIPSTORMBANE1", SpellId.CANTRIPSTORMBANE1 },
+		    { "CANTRIPSTORMBANE2", SpellId.CANTRIPSTORMBANE2 },
+		    { "CANTRIPSTORMBANE3", SpellId.CANTRIPSTORMBANE3 },
+	    };
+    private double ApplySpellOnSpecializedArmorActTime = 0;
+    private static double ApplySpellOnSpecializedArmorActInt = 5;
+    private void ApplySpellOnSpecializedArmor(Player defender, DamageType damageType, BodyPart bodyPart)
+    {
+	    var currentTime = Time.GetUnixTime();
+        if (ApplySpellOnSpecializedArmorActTime > currentTime)
+        return;
+	
+	    ApplySpellOnSpecializedArmorActTime = currentTime + ApplySpellOnSpecializedArmorActInt;
+
+	    var Armor = defender.GetArmorLayers(defender, bodyPart);
+        var armorSkill = defender.GetCreatureSkill(Skill.Armor);
+
+        if (armorSkill.AdvancementClass == SkillAdvancementClass.Specialized)
+        {
+            if (_damageTypeToSpellMapping.TryGetValue(damageType, out string baseSpellName))
+            {
+                int maxUsableSpellLevel = 2;
+                int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)armorSkill.Current - 310) / 50.0)), maxUsableSpellLevel);
+                int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)armorSkill.Current - 150) / 50.0), maxUsableSpellLevel));
+
+                int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
+
+                string spellTypePrefix;
+                switch (spellLevel + 1)
+                {
+                    case 1: spellTypePrefix = "a minor"; break;
+                    default:
+                    case 2: spellTypePrefix = "a major"; break;
+                }
+
+                string actualSpellName = baseSpellName.Remove(baseSpellName.Length - 1) + (spellLevel + 1).ToString();
+
+                    if (_spellNameToIdMapping.TryGetValue(actualSpellName, out SpellId actualSpellId))
+                    {
+                        var equippedArmors = Armor;
+
+                        if (equippedArmors != null && equippedArmors.Any())
+                        {
+                            Spell spellToCast = new Spell(actualSpellId);
+
+                            foreach (var armor in equippedArmors)
+                            {
+                                armor.TryCastSpell(spellToCast, armor, null, null, false, false, false, false);
+                            }
+
+                            defender.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your {bodyPart} armor has been enhanced with {spellTypePrefix} bane to {damageType}.", ChatMessageType.System));
+                        }
+                    }
+               }
+        }
+    }
+        
         /// <summary>
         /// Returns the damage rating modifier for an applicable Recklessness attack
         /// </summary>
