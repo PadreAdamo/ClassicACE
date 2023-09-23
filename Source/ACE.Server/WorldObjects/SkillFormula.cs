@@ -39,17 +39,37 @@ namespace ACE.Server.WorldObjects
         }
 
         /// <summary>
-        /// Converts AL from an additive linear value
+        /// ORIGINAL DEKARU - Converts AL from an additive linear value
         /// to a scaled damage multiplier
         /// </summary>
+        ///public static float CalcArmorMod(float armorLevel)
+        ///{
+            ///if (armorLevel > 0)
+               /// return ArmorMod / (armorLevel + ArmorMod);
+            ///else if (armorLevel < 0)
+                ///return 1.0f - armorLevel / ArmorMod;
+            ///else
+                ///return 1.0f;
+        ///}
+
+        /// <summary>
+        /// As armor skill goes up so does damage mitigation
+        /// <summary>
         public static float CalcArmorMod(float armorLevel)
         {
             if (armorLevel > 0)
-                return ArmorMod / (armorLevel + ArmorMod);
+            {
+                return armorLevel;  // Direct scaling with armorLevel
+            }
             else if (armorLevel < 0)
-                return 1.0f - armorLevel / ArmorMod;
+            {
+                return 1.0f - armorLevel;  // Increases susceptibility to damage
+            }   
             else
-                return 1.0f;
+            {
+            return 1.0f;  // No modification
+            }
         }
+   
     }
 }
