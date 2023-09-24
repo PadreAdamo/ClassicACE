@@ -93,15 +93,15 @@ namespace ACE.Server.WorldObjects
             actionChain.EnqueueChain();
         }
 
-        public bool TestSneaking(Creature creature, double distanceSquared, string failureMessage)
-        {
-            if (!IsSneaking)
-                return false;
+///        public bool TestSneaking(Creature creature, double distanceSquared, string failureMessage)
+///        {
+ ///           if (!IsSneaking)
+ ///               return false;
+///
+            ///if (creature == null || creature.PlayerKillerStatus == PlayerKillerStatus.RubberGlue || creature.PlayerKillerStatus == PlayerKillerStatus.Protected || distanceSquared > creature.VisualAwarenessRangeSq || !creature.IsDirectVisible(this))
+               /// return true;
 
-            if (creature == null || creature.PlayerKillerStatus == PlayerKillerStatus.RubberGlue || creature.PlayerKillerStatus == PlayerKillerStatus.Protected || distanceSquared > creature.VisualAwarenessRangeSq || !creature.IsDirectVisible(this))
-                return true;
-
-            var difficulty = (uint)(EnterSneakingDifficulty + creature.Level ?? 1);
+            ///var difficulty = (uint)(EnterSneakingDifficulty + creature.Level ?? 1);
 
 /// Removing immediate failure from sneak from equation for more reliable detaunt effect
      ///   var angle = Math.Abs(creature.GetAngle(this));
@@ -112,20 +112,58 @@ namespace ACE.Server.WorldObjects
                  ///   EndSneaking(failureMessage);
                    /// return false;
                /// }
-              if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
-                    difficulty *= 3;
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
-                    difficulty *= 2;
-                else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
-                    difficulty *= 1;
-                else
-                    difficulty = (uint)(difficulty * 0.1f);
-            }
+    ///          if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
+    ///                difficulty *= 3;
+     ///           else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
+    ///                difficulty *= 2;
+     ///           else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
+      ///              difficulty *= 1;
+     ///           else
+     ///               difficulty = (uint)(difficulty * 0.1f);
+   ///         }
         ///    else
            ///      difficulty = (uint)(difficulty * 0.5f);
+///         return TestSneaking(difficulty, failureMessage);       
+          ///}
+
+    public bool TestSneaking(Creature creature, double distanceSquared, string failureMessage)
+    {
+        if (!IsSneaking)
+        return false;
+
+        if (creature == null || creature.PlayerKillerStatus == PlayerKillerStatus.RubberGlue || creature.PlayerKillerStatus == PlayerKillerStatus.Protected || distanceSquared > creature.VisualAwarenessRangeSq || !creature.IsDirectVisible(this))
+        return true;
+
+        var sneakingSkill = GetCreatureSkill(Skill.Sneaking);
+
+        // Base difficulty on creature's level.
+        var baseDifficulty = (uint)(EnterSneakingDifficulty + (creature.Level ?? 1));
+        uint difficulty;
+
+        // If Sneak is specialized, ignore distance and multiply the creature's level by 3.
+        if (sneakingSkill.AdvancementClass == SkillAdvancementClass.Specialized)
+        {
+            difficulty = baseDifficulty * 3;
+            return TestSneaking(difficulty, failureMessage);
+        }
+        // If Sneak is trained, include distance in calculations.
+        else if (sneakingSkill.AdvancementClass == SkillAdvancementClass.Trained)
+        {
+            difficulty = baseDifficulty;
+
+            if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
+                difficulty *= 3;
+            else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
+                difficulty *= 2;
+            else if (distanceSquared < creature.VisualAwarenessRangeSq / 400)
+                difficulty *= 1;
+            else
+                difficulty = (uint)(difficulty * 0.1f);
 
             return TestSneaking(difficulty, failureMessage);
         }
+        return false;  // Fallback case.
+    }
 
         public bool TestSneaking(Creature creature, string failureMessage)
         {
