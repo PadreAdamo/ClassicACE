@@ -14,13 +14,15 @@ A HUGE THANK YOU TO DEKARU, ADVAN, and the ENTIRE CLASSICACE TEAM!
 
 ** Initial and Up to Date Changes:**
 - *Specialized Armor skill will cast minor/major banes during combat on armor/body parts that are damaged*
+- *Armor Skill diminshing returns removed. New Formula*
+- *Two-Handed Weapons now have higher critical chance*
 - *Appraise effectiveness signficantly boosted*
 - *Shield more effective especially early game*
 - *One-handed spears will now pierce one target (Think Cleave but a very narrow cone) that is behind your primary*
 - *Axes have a critical damage bonus modifier*
 - *Crossbows have a critical damage bonus modifier*
 - *Axe/Mace skill has a debuff of attributes component that is defended against by the Deception skill (yes, mobs will use this against you!)*
-- *Sneak is an active detaunt*
+- *Sneak is an active detaunt / Trained Sneak follows if the monster can see you / Specialized Sneak ignores this and allows you to use sneak as active attack combo*
 - *Deception taunt more effective*
 - *Reduced Cooldown on Assess debuff*
 - *Increased XP cost to remove vitae penalty*
