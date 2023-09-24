@@ -143,7 +143,7 @@ namespace ACE.Server.WorldObjects
         // If Sneak is specialized, ignore distance and multiply the creature's level by 3.
         if (sneakingSkill.AdvancementClass == SkillAdvancementClass.Specialized)
         {
-            difficulty = baseDifficulty * 3;
+            difficulty = baseDifficulty * 4;
             return TestSneaking(difficulty, failureMessage);
         }
         // If Sneak is trained, include distance in calculations.
