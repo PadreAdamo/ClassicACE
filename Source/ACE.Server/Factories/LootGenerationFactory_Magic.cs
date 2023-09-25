@@ -981,6 +981,12 @@ namespace ACE.Server.Factories
         /// </summary>
         private static int CalculateArcaneLore(WorldObject wo, TreasureRoll roll)
         {
+            // Initialize a Random object
+            Random random = new Random();
+
+            // Generate a random number between 1 and 10
+            int randomItemDifficulty = random.Next(1, 11);  // Note: Upper-bound is exclusive, so we use 11 to include 10
+            
             // spellcraft - (itemSkillLevelLimit / 2.0f) + creatureLifeEnchantments + cantrips
 
             var spellcraft = wo.ItemSpellcraft.Value;
@@ -1011,8 +1017,12 @@ namespace ACE.Server.Factories
 
             if (fArcane < 0)
                 fArcane = 0;
+            
+            //old calculation from Dekaru
+            //return (int)Math.Floor(fArcane + roll.ItemDifficulty);
 
-            return (int)Math.Floor(fArcane + roll.ItemDifficulty);
+            // Use the random number for ItemDifficulty
+            return (int)Math.Floor(fArcane + randomItemDifficulty);
         }
     }
 }
