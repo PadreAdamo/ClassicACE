@@ -14,6 +14,7 @@ A HUGE THANK YOU TO DEKARU, ADVAN, and the ENTIRE CLASSICACE TEAM!
 
 ** Initial and Up to Date Changes:**
 - *Specialized Armor skill will cast minor/major banes during combat on armor/body parts that are damaged*
+- *Specialized Arcane Lore will now provide a Spell Casting haste in 4 tiers up to 160%*
 - *Armor Skill diminshing returns removed. New Formula*
 - *Two-Handed Weapons now have higher critical chance*
 - *Appraise effectiveness signficantly boosted*
