@@ -704,44 +704,72 @@ namespace ACE.Server.WorldObjects
 
         public void DoCastGesture(Spell spell, WorldObject casterItem, ActionChain castChain)
         {
+            // Create a local variable to hold the adjusted casting speed
+            float adjustedCastSpeed = CastSpeed;  // Initialize with default value
+
+            // Your logic for adjusting the casting speed based on Arcane Lore
+            var arcaneLoreSkill = GetCreatureSkill(Skill.ArcaneLore);
+            if (arcaneLoreSkill.AdvancementClass > SkillAdvancementClass.Trained)
+           {
+            int acLoreLevel = (int)arcaneLoreSkill.Current;
+
+                if (acLoreLevel >= 225)
+                {
+                    adjustedCastSpeed += 1.2f; // add to get 3.2 (base is 2.0)
+                }
+                else if (acLoreLevel >= 185)
+                {
+                    adjustedCastSpeed += 0.8f; // add to get 2.8 (base is 2.0)
+                }
+                else if (acLoreLevel >= 145)
+                {
+                    adjustedCastSpeed += 0.4f; // add to get 2.4 (base is 2.0)
+                }
+                else if (acLoreLevel >= 100)
+                {
+                    adjustedCastSpeed += 0.2f; // add to get 2.2 (Base is 2.0)
+                }
+            }
+
             MagicState.CastGesture = spell.Formula.CastGesture;
 
-            if (casterItem != null)
-            {
-                //var caster = GetEquippedWand();
-                if (casterItem.UseUserAnimation != 0)
-                    MagicState.CastGesture = casterItem.UseUserAnimation;
-            }
-            else if (MagicState.IsCombatCasting)
-                MagicState.CastGesture = MotionCommand.CastSpell;
+        if (casterItem != null)
+        {
+            if (casterItem.UseUserAnimation != 0)
+            MagicState.CastGesture = casterItem.UseUserAnimation;
+        }
+        else if (MagicState.IsCombatCasting)
+        {
+            MagicState.CastGesture = MotionCommand.CastSpell;
+        }
 
-            if (RecordCast.Enabled)
-            {
-                castChain.AddAction(this, () =>
-                {
-                    var animLength = Physics.Animation.MotionTable.GetAnimationLength(MotionTableId, CurrentMotionState.Stance, MagicState.CastGesture, CastSpeed);
-                    RecordCast.Log($"Cast Gesture: {MagicState.CastGesture}, Cast Time: {animLength}");
-                });
-            }
-
+        if (RecordCast.Enabled)
+        {
             castChain.AddAction(this, () =>
-            {
-                if (!MagicState.IsCasting) return;
-
-                MagicState.CastGestureStartTime = DateTime.UtcNow;
-
-                if (FastTick)
-                    PhysicsObj.StopCompletely(false);
+            {    
+                var animLength = Physics.Animation.MotionTable.GetAnimationLength(MotionTableId, CurrentMotionState.Stance, MagicState.CastGesture, adjustedCastSpeed);
+                RecordCast.Log($"Cast Gesture: {MagicState.CastGesture}, Cast Time: {animLength}");
             });
+        }
 
-            if (MagicState.CastGesture == MotionCommand.Invalid)
-                MagicState.CastGesture = MotionCommand.Ready;
+        castChain.AddAction(this, () =>
+        {
+           if (!MagicState.IsCasting) return;
 
-            var castTime = 0.0f;
-            if (FastTick)
-                castTime = EnqueueMotion(castChain, MagicState.CastGesture, CastSpeed, true, null, !MagicState.IsCombatCasting);
-            else
-                castTime = EnqueueMotionMagic(castChain, MagicState.CastGesture, CastSpeed);
+            MagicState.CastGestureStartTime = DateTime.UtcNow;
+
+           if (FastTick)
+            PhysicsObj.StopCompletely(false);
+        });
+
+        if (MagicState.CastGesture == MotionCommand.Invalid)
+            MagicState.CastGesture = MotionCommand.Ready;
+
+        var castTime = 0.0f;
+        if (FastTick)
+            castTime = EnqueueMotion(castChain, MagicState.CastGesture, adjustedCastSpeed, true, null, !MagicState.IsCombatCasting);
+        else
+            castTime = EnqueueMotionMagic(castChain, MagicState.CastGesture, adjustedCastSpeed);
 
             //Console.WriteLine($"Cast Gesture: " + MagicState.CastGesture);
             //Console.WriteLine($"Cast time: " + castTime);
